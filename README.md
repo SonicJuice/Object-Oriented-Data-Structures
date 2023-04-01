@@ -5,7 +5,7 @@ These include:
 
 - Linear Queue
 
-- Priority Queue
+- Circular Queue
 
 - Graph (utilising an adjacency list)
 
