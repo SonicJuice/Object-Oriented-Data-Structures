@@ -7,6 +7,8 @@ These include:
 
 - Circular Queue
 
+- Priority Queue (utilising a heap to maintain logical element order via min/max-heap enquing/dequing rules)
+
 - Graph (utilising an adjacency list)
 
 - Binary Tree (w/ in, pre, and post-order traversal methods; balancing method TBA)
