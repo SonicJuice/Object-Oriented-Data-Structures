@@ -34,4 +34,4 @@ class CircularQueue(object):
         return self.__size == 0
 
     def __str__(self):
-        return " ".join[(str(item) for item in self.__q[self.__front:self.__rear + 1]])
+        return " ".join[(str(item) for item in self.__q[self.__front:self.__rear + 1])]
