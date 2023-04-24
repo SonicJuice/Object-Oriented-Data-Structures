@@ -1,13 +1,15 @@
 # AQA A-Level CS ADT Implementations
 OO Python implementations of all ADTs included in the AQA A-Level CS Specification!
 
-These include:
+These are:
 
 - Linear Queue
 
 - Circular Queue
 
 - Priority Queue (utilising a heap to maintain logical element order via min/max-heap enquing/dequing rules)
+
+- Stack
 
 - Graph (utilising both an adjacency list and matrix)
 
