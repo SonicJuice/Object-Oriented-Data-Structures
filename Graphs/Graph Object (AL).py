@@ -11,12 +11,12 @@ class Graph(object):
         if new_node not in self.__adj_list:
             self.__adj_list[new_node] = {}
         else:
-            print("Node already exists.")
+            raise ValueError("Node already exists.")
 
     def removeNode(self, node_to_remove):
         """ if node is in the AL, delete the key-value pair from '__adj_list', effectively removing the node and all its outgoing edges from the graph. """
         if node_to_remove not in self.__adj_list:
-            print("Node not found.")
+            raise ValueError("Node not found.")
         else:
             del self.__adj_list[node_to_remove]
 
