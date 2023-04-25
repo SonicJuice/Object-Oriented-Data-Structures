@@ -11,7 +11,7 @@ These are:
 
 - Stack
 
-- Graph (utilising both an adjacency list and matrix)
+- Graph (utilising both an adjacency list w/ depth/breath-first searching, as well as Dijsktra's, algorithms)
 
 - Binary Tree (w/ in, pre, and post-order traversal methods; balancing method TBA)
 
