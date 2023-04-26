@@ -14,7 +14,7 @@ class LinearQueue(object):
         """ adds an element item to the rear, first checking if the queue is full. Otherwise, it increments the rear pointer, 
         assigns the item to the rear of the queue, increments the size of the queue, and returns True. """
         if self.isFull():
-            return False
+            raise ValueError("Queue is full.")
         else:
             self.__rear += 1
             self.__q[self.__rear] = item
@@ -25,7 +25,7 @@ class LinearQueue(object):
         """ removes and returns the element from the front, first checking if the queue is empty. Otherwise, it decrements the size of the queue, 
         retrieves the element from the front of the queue, increments the front pointer, and returns the retrieved element. """
         if self.isEmpty():
-            return None
+            raise ValueError("Queue is empty. ")
         else:
             self.__size -= 1
             item = self.__q[self.__front]
