@@ -11,7 +11,7 @@ class PriorityQueue(object):
     at the root' (max-heap). """
     def enQueue(self, item, priority):
         if self.isFull():
-            return False
+            raise ValueError("Queue is full.")
         else:
             self.__size += 1
             i = self.__size - 1
@@ -20,7 +20,7 @@ class PriorityQueue(object):
             where the item w/ the highest priority is moved up the heap until it reaches its correct position. """
             self.__q[i] = (item, priority)
             while i > 0 and priority > self.__q[(i - 1) // 2][1]:
-                """ achieved via a while loop that compares the priority of the item with its parent (calculated via '//` 2'),
+                """ achieved via a while loop that compares the priority of the item with its parent ('(i - 1)' // 2 represents the parent's index.),
                 and swaps them if the priority of the item is greater. """
                 self.__q[i], self.__q[(i - 1) // 2] = self.__q[(i - 1) // 2], self.__q[i]
                 i = (i - 1) // 2
@@ -30,7 +30,7 @@ class PriorityQueue(object):
         """ if the PQ isn't empty, retrieve the item and its priority from the first element of the list '__q' which represents the root of the heap.
         It then replaces the root with the last item in'__q', and sets the last item to None. """
         if self.isEmpty():
-            return None
+            raise ValueError("Queue is empty.")
         else:
             item, priority = self.__q[0]
             self.__q[0] = self.__q[self.__size - 1]
@@ -42,6 +42,7 @@ class PriorityQueue(object):
            with its children (calculated using 2 * i + 1 and 2 * i + 2, where i is the index of the root),and swaps them if the priority of
            the root item is lower. Finally, it returns the removed item and its priority as a tuple. """
             while i >= 0:
+                """ represents the index of the left and right children. """
                 left = 2 * i + 1
                 right = 2 * i + 2
                 largest = i
