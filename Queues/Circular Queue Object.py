@@ -11,7 +11,7 @@ class CircularQueue(object):
 
     def enQueue(self,item):
         if self.isFull():
-            return False
+            raise ValueError("Queue is full.")
         else:
             self.__rear = (self.__rear + 1) % self.__max_size
             self.__q[self.__rear] = item
@@ -19,8 +19,8 @@ class CircularQueue(object):
             return True
 
     def deQueue(self):
-        if self.iEmpty():
-            return None
+        if self.isEmpty():
+            raise ValueError("Queue is empty.")
         else:
             self.__size -= 1
             item = self.__q[self.__front]
