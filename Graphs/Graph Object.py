@@ -138,7 +138,7 @@ class Graph:
 
         while pq:
             """ a heap is used to implement a priority queue; 'heappop' removes and returns the smallest element, whilst the order is adjusted 
-            to maintain the order properties (see 'Priority Queue Object.py'). """
+            to maintain the order properties (as mentioned in 'Priority Queue Object.py'). """
             distance, current_node = heappop(pq)
             if current_node in visited:
                 continue
