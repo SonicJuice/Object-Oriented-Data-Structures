@@ -134,8 +134,7 @@ class Graph:
         return result
   
     def dijkstrasShortestPath(self, node):
-        """ for this method, add edges in the form ("A", "B"), ("B", "A"). Here, a dictionary is initialised with the 
-        source as the key and its distance from itself as 0; all other node distances are set to infinity. """
+        """ dictionary is initialised wi/ the source as the key, and its distance from itself as 0; all other node distances are set to infinity. """
         if node not in self.__nodes:
             raise ValueError("Node doesn't exist.")
             
