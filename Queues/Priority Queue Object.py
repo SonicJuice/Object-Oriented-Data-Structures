@@ -13,7 +13,8 @@ class PriorityQueue(object):
             self.__size += 1
             i = self.__size - 1
             self.__q.append((item, priority))
-            """ append a tuple containing the item and its priority, then perform a heapify operation by swapping the new item w/ its parent until the parent has a higher priority, or the item becomes the root. This ensures that the highest priority item is always at the root. """
+            """ append a tuple containing the item and its priority, then perform a heapify operation by swapping the new item w/ its parent 
+            until the parent has a higher priority, or the item becomes the root. This ensures that the highest priority item is always at the root. """
             while i > 0 and priority <= self.__q[(i - 1) // 2][1]:
                 self.__q[i], self.__q[(i - 1) // 2] = self.__q[(i - 1) // 2], self.__q[i]
                 """ represent parent index. """
@@ -29,7 +30,8 @@ class PriorityQueue(object):
             self.__size -= 1
             i = 0
 
-            """ store the item and its priority from the root, replace the root with the last item in the heap, and remove the last item from the heap. Then perform a heapify operation by swapping the root w/ its smallest child until the root has a lower priority than its children, or it becomes a leaf node. """
+            """ store the item and its priority from the root, replace the root with the last item in the heap, and remove the last item from the heap. 
+            Then perform a heapify operation by swapping the root w/ its smallest child until the root has a lower priority than its children, or it becomes a leaf node. """
             while i >= 0:
                 """ represents child indexes. """
                 left = 2 * i + 1
