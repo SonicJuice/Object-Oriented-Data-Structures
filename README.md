@@ -7,11 +7,11 @@ These are:
 
 - Circular Queue
 
-- Priority Queue (utilising a heap to maintain logical element order via min/max-heap enquing/dequing rules)
+- Priority Queue (utilising a heap to maintain logical element order via heap rules)
 
 - Stack
 
-- Graph (utilising both an adjacency list w/ depth/breath-first searching, as well as Dijsktra's Shortest Path algorithm)
+- Graph (utilising an adjacency list w/ depth/breath-first searching, as well as Dijsktra's Shortest Path algorithm)
 
 - Binary Tree (w/ in, pre, and post-order traversal methods; balancing method TBA)
 
