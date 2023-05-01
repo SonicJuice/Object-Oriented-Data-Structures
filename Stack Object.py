@@ -12,12 +12,6 @@ class Stack(object):
             for item in iterable:
                 self.push(item)
 
-    def isEmpty(self):
-        return self.__size == 0
-    
-    def isFull(self):
-        return self.__size == self.__max_size
-
     def push(self,item):
         """ adds a new item to the top of stack; returns False if stack is full. """
         if self.isFull() == False:
@@ -29,13 +23,13 @@ class Stack(object):
             return False
 
     def pop(self):
-        """ returns top item from the stack; returns None if empty. """
+        """ returns top item from the stack. """
         if self.isEmpty() == False:
             self.__size -= 1
             """ '.pop()' removes an item from a list according to its index value.  """
             return self.__stack.pop(0)
         else:
-            return None
+            raise ValueError("Stack is empty.")
 
     def peek(self):
         """ returns the top item without removing it. """
@@ -43,13 +37,19 @@ class Stack(object):
             self.__size -= 1
             return self.__stack[0]
         else:
-            return None
+            raise ValueError("Stack is empty")
 
     def size(self):
         """ returns no. of items in stack. """
         return self.__size
 
-    def __str__(self):
+    def isFull(self):
+        return self.__size == self.__max_size
+
+    def isEmpty(self):
+        return self.__size == 0
+  
+    def showStack(self):
         output = ""
         for item in self.__stack:
             output += str(item) + "\n"
