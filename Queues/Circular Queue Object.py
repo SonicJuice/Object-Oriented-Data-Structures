@@ -13,6 +13,7 @@ class CircularQueue(object):
         if self.isFull():
             raise ValueError("Queue is full.")
         else:
+            """ modulo operator allows pointers to wrap around to the beginning of the array once they reach the end. """
             self.__rear = (self.__rear + 1) % self.__max_size
             self.__q[self.__rear] = item
             self.__size += 1
@@ -33,5 +34,5 @@ class CircularQueue(object):
     def isEmpty(self):
         return self.__size == 0
 
-    def __str__(self):
-        return " ".join[(str(item) for item in self.__q[self.__front:self.__rear + 1])]
+    def showQueue(self):
+        return " ".join(str(item) for item in self.__q[self.__front:self.__rear + 1])
