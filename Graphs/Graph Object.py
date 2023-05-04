@@ -40,8 +40,8 @@ class Graph:
             raise ValueError("Origin doesn't exist.")
         if destination not in self.__nodes:
             raise ValueError("Destination doesn't exist.")
-        if not isinstance(weight, (int, float)):
-            raise ValueError("Non-numeric weight.")
+        if not isinstance(weight, (int)):
+            raise ValueError("Non-positive integer weight.")
         self.__nodes[origin].edges[destination] = weight
         if not self.__directed:
             self.__nodes[destination].edges[origin] = weight
