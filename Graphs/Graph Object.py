@@ -24,9 +24,9 @@ class Graph:
         else:
             raise ValueError("Node already exists.")
 
-    def removeNode(self, node_to_remove):
-        if node_to_remove in self.__nodes:
-            del self.__nodes[node_to_remove]
+    def deleteNode(self, node_to_delete):
+        if node_to_delete in self.__nodes:
+            del self.__nodes[node_to_delete]
         else:
             raise ValueError("Node doesn't exist.")
 
