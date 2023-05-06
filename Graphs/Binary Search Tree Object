@@ -3,16 +3,15 @@ from tabulate import tabulate
 
 class Node:
     def __init__(self, data):
-        self.left = -1
+        self.left = None
         self.data = data
-        self.right = -1
+        self.right = None
 
-#--------------------------------------------------------------------
-
+#------------------------------------------------------------------
 
 """ trees are connected, undirected graph wo/ cycles; this means that it's impossible to find a path which 
 returns to the start node without traversing an edge twice. Each node in a binary search tree can have up two children, 
-storing data such that all nodes in the left subtree are < the current node, and all nodes in the right subtree are >. """
+storing data such that all nodes in the left subtree are < the root, and all nodes in the right subtree are >. """
 class BinarySearchTree:
     def __init__(self, root_data):
         self.__branches = []
@@ -20,27 +19,27 @@ class BinarySearchTree:
         self.__branches.append(root)
 
     def addNode(self, data, current_node = 0):
-        if current_node == -1:
+        if current_node is None:
             current_node = 0
-    
+
         if self.__branches[current_node].data >= data:
-            if self.__branches[current_node].left == -1:
+            if self.__branches[current_node].left is None:
                 next_index = len(self.__branches)
                 self.__branches.append(Node(data))
                 self.__branches[current_node].left = next_index
             else:
                 self.addNode(data, self.__branches[current_node].left)
         else:
-            if self.__branches[current_node].right == -1:
+            if self.__branches[current_node].right is None:
                 next_index = len(self.__branches)
                 self.__branches.append(Node(data))
                 self.__branches[current_node].right = next_index
             else:
                 self.addNode(data, self.__branches[current_node].right)
 
-    def deleteNode(self, data, current_node = 0, parent = None):
+    def deleteNode(self, data, current_node = 0, parent=None):
         """ find the node to be deleted. """
-        while current_node != -1 and self.__branches[current_node].data != data:
+        while current_node is not None and self.__branches[current_node].data != data:
             parent = current_node
             if self.__branches[current_node].data > data:
                 current_node = self.__branches[current_node].left
@@ -48,36 +47,36 @@ class BinarySearchTree:
                 current_node = self.__branches[current_node].right
 
         """ if the node wasn't found. """
-        if current_node == -1:
+        if current_node is None:
             raise ValueError("Node doesn't exist.")
 
         """ if the node has no children, remove it. """
-        if self.__branches[current_node].left == -1 and self.__branches[current_node].right == -1:
+        if self.__branches[current_node].left is None and self.__branches[current_node].right is None:
             if parent is not None:
                 if self.__branches[parent].left == current_node:
-                    self.__branches[parent].left = -1
+                    self.__branches[parent].left = None
                 else:
-                    self.__branches[parent].right = -1
+                    self.__branches[parent].right = None
             else:
                 """ node to be deleted is the root. """
                 self.__branches = []
 
             """ if the node has one child, replace it w/ the child. """
-        elif self.__branches[current_node].left == -1 or self.__branches[current_node].right == -1:
-            child = self.__branches[current_node].left if self.__branches[current_node].left != -1 else self.__branches[current_node].right
+        elif self.__branches[current_node].left is None or self.__branches[current_node].right is None:
+            child = self.__branches[current_node].left if self.__branches[current_node].left is not None else self.__branches[current_node].right
             if parent is not None:
                 if self.__branches[parent].left == current_node:
                     self.__branches[parent].left = child
                 else:
                     self.__branches[parent].right = child
             else:
-                """ node to be deleted is the root. """                
+                """ node to be deleted is the root. """
                 self.__branches = [child]
 
             """ if the node has two children, find the in-order successor and replace it w/ the node. """
         else:
             successor = self.__branches[current_node].right
-            while self.__branches[successor].left != -1:
+            while self.__branches[successor].left is not None:
                 parent = successor
                 successor = self.__branches[successor].left
             self.__branches[current_node].data = self.__branches[successor].data
@@ -89,7 +88,7 @@ class BinarySearchTree:
         """ finally, remove it from '__branches' list. """
         del self.__branches[current_node]
 
-    """ 'tree[i]' indicates the index of the child represented by the relevant pointers; -1 indicates that there's no child 
+    """ 'tree[i]' indicates the index of the child represented by the relevant pointers; None indicates that there's no child 
     on the relevant side. """
     def showBST(self):
         table = []
@@ -98,72 +97,81 @@ class BinarySearchTree:
             table.append([f"tree[{i}]", node.left, node.data, node.right])
         headers = ["Left", "Value", "Right"]
         return tabulate(table, headers)
-  
-    def showSubTree(self, data, current_node = 0):
-        parent = None
-    
-        while current_node != -1 and self.__branches[current_node].data != data:
-            parent = current_node
+
+    """ 'tree[i]' indicates the index of the child represented by the relevant pointers; None indicates that there's no child 
+    on the relevant side. """
+    def showSubTree(self, data, current_node=0):
+        while current_node is not None and self.__branches[current_node].data != data:
             if self.__branches[current_node].data > data:
                 current_node = self.__branches[current_node].left
             else:
                 current_node = self.__branches[current_node].right
 
-        if current_node == -1:
+        if current_node is None:
             raise ValueError("Node doesn't exist.")
 
-        """ node is a root. """
-        if parent is None:
-            if self.__branches[current_node].left != -1 and self.__branches[current_node].right != -1:
-                return f"{data} is the root, w/ left and right children {self.__branches[self.__branches[current_node].left].data} and {self.__branches[self.__branches[current_node].right].data}."
-          
-        else:
-            """ node isn't a root. """
-            if self.__branches[current_node].left == -1 and self.__branches[current_node].right == -1:
-                """ node is a leaf. """
-                parent_data = self.__branches[parent].data
-                return f"{data} is a leaf, w/ a parent of {parent_data}."
+        """ when the node has no children. """
+        if self.__branches[current_node].left is None and self.__branches[current_node].right is None:
+            return f"({data}) is a leaf node."
 
-                """ node has one child. """
-            elif self.__branches[current_node].left == -1 or self.__branches[current_node].right == -1:
-                child = self.__branches[current_node].left if self.__branches[current_node].left != -1 else self.__branches[current_node].right
-                parent_data = self.__branches[parent].data
-                child_data = self.__branches[child].data
-                return f"{data} has a parent of {parent_data} and a child of {child_data}."
-            else:
-                """ node has two children. """
-                return f"{data} has two children: {self.__branches[self.__branches[current_node].left].data} and {self.__branches[self.__branches[current_node].right].data}."
+        """ when the node has only one child. """
+        if self.__branches[current_node].left is None or self.__branches[current_node].right is None:
+            child_index = self.__branches[current_node].left if self.__branches[current_node].left is not None else self.__branches[current_node].right
+            child_data = self.__branches[child_index].data
+            return f"({data}) has one child: ({child_data})."
 
-    """ visit left sub-tree, root, right sub-tree (starting to the left of the root, output the corresponding 
-    data when passing beneath a node). """
-    def inOrder(self, current_node = 0, visited = []):
-        if self.__branches[current_node].left != -1:
-            self.inOrder(self.__branches[current_node].left, visited)
+        """ when the node has two children. """
+        left_child_index = self.__branches[current_node].left
+        left_child_data = self.__branches[left_child_index].data
+        right_child_index = self.__branches[current_node].right
+        right_child_data = self.__branches[right_child_index].data
+        return f"({data}) has two children: left child ({left_child_data}), right child ({right_child_data})."
+
+    """ visit left sub-tree, root, right sub-tree (starting to the left of the root, output the corresponding data when passing beneath a node). """
+    def inOrderTraversal(self, current_node = 0, visited = []):
+        if self.__branches[current_node].left is not None:
+            self.inOrderTraversal(self.__branches[current_node].left, visited)
         visited.append(current_node)
-        if self.__branches[current_node].right != -1:
-            self.inOrder(self.__branches[current_node].right, visited)
+        if self.__branches[current_node].right is not None:
+            self.inOrderTraversal(self.__branches[current_node].right, visited)
         return [self.__branches[i].data for i in visited]
 
     """ visit the root, left sub-tree, right sub-tree (starting to the left of the root, output the corresponding 
     data when passing to the left of a node). """
-    def preOrder(self, current_node = 0, visited = []):
+    def preOrderTraversal(self, current_node = 0, visited = []):
         visited.append(current_node)
-        if self.__branches[current_node].left != -1:
-            self.preOrder(self.__branches[current_node].left, visited)
-        if self.__branches[current_node].right != -1:
-            self.preOrder(self.__branches[current_node].right, visited)
+        if self.__branches[current_node].left is not None:
+            self.preOrderTraversal(self.__branches[current_node].left, visited)
+        if self.__branches[current_node].right is not None:
+            self.preOrderTraversal(self.__branches[current_node].right, visited)
         return [self.__branches[i].data for i in visited]
 
     """ visit left sub-tree, right sub-tree, root (starting to the right of the root, output the corresponding 
     data when passing to the right a node). """
-    def postOrder(self, current_node = 0, visited = []):
-        if self.__branches[current_node].left != -1:
-            self.postOrder(self.__branches[current_node].left, visited)
-        if self.__branches[current_node].right != -1:
-            self.postOrder(self.__branches[current_node].right, visited)
+    def postOrderTraversal(self, current_node = 0, visited = []):
+        if self.__branches[current_node].left is not None:
+            self.postOrderTraversal(self.__branches[current_node].left, visited)
+        if self.__branches[current_node].right is not None:
+            self.postOrderTravesal(self.__branches[current_node].right, visited)
         visited.append(current_node)
         return [self.__branches[i].data for i in visited]
 
-
     def balanceBST(self):
         pass
+
+tree = BinarySearchTree(17)
+
+tree.addNode(8)
+tree.addNode(4)
+tree.addNode(12)
+tree.addNode(22)
+tree.addNode(19)
+
+tree.addNode(14)
+tree.addNode(5)
+tree.addNode(30)
+tree.addNode(25)
+
+print(tree.showBST())
+
+print(tree.preOrderTraversal())
