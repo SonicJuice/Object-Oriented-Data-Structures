@@ -118,7 +118,6 @@ class BinarySearchTree:
         right_child_data = self.__branches[right_child_index].data
         return f"({data}) has two children: left child ({left_child_data}), right child ({right_child_data})."
 
-
     """ visit left sub-tree, root, right sub-tree (starting to the left of the root, output the corresponding data when passing beneath a node). """
     def inOrderTraversal(self, current_node = 0, visited = []):
         if self.__branches[current_node].left is not None:
@@ -148,35 +147,6 @@ class BinarySearchTree:
         visited.append(current_node)
         return [self.__branches[i].data for i in visited]
 
-
-    def balanceBST(self):
-        def obtainInOrder(node, nodes):
-            if node is not None:
-                obtainInOrder(self.__branches[node].left, nodes)
-                nodes.append(self.__branches[node])
-                obtainInOrder(self.__branches[node].right, nodes)
-
-        nodes = []
-        obtainInOrder(0, nodes)
-
-        def buildBalancedBST(start, end):
-            if start > end:
-                return None
-
-            mid = (start + end) // 2
-            node = nodes[mid]
-            node.left = buildBalancedBST(start, mid - 1)
-            node.right = buildBalancedBST(mid + 1, end)
-            return node
-
-        root = buildBalancedBST(0, len(nodes) - 1)
-        self.__branches = [None] * len(nodes)
-        for i, node in enumerate(nodes):
-            self.__branches[i] = node
-            node.left = None if node.left is None else nodes.index(node.left)
-            node.right = None if node.right is None else nodes.index(node.right)
-        return root
-
     """ 'tree[i]' indicates the index of the child represented by the relevant pointers; None indicates that there's no child 
     on the relevant side. """
     def showBST(self):
@@ -201,3 +171,5 @@ tree.addNode(30)
 tree.addNode(25)
 
 print(tree.showBST())
+
+print(tree.showSubTree(17)))
