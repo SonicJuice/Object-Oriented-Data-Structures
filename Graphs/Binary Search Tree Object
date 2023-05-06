@@ -9,6 +9,7 @@ class Node:
 
 #------------------------------------------------------------------
 
+
 """ trees are connected, undirected graph wo/ cycles; this means that it's impossible to find a path which 
 returns to the start node without traversing an edge twice. Each node in a binary search tree can have up two children, 
 storing data such that all nodes in the left subtree are < the root, and all nodes in the right subtree are >. """
@@ -37,7 +38,7 @@ class BinarySearchTree:
             else:
                 self.addNode(data, self.__branches[current_node].right)
 
-    def deleteNode(self, data, current_node = 0, parent=None):
+    def deleteNode(self, data, current_node = 0, parent = None):
         """ find the node to be deleted. """
         while current_node is not None and self.__branches[current_node].data != data:
             parent = current_node
@@ -87,17 +88,7 @@ class BinarySearchTree:
 
         """ finally, remove it from '__branches' list. """
         del self.__branches[current_node]
-
-    """ 'tree[i]' indicates the index of the child represented by the relevant pointers; None indicates that there's no child 
-    on the relevant side. """
-    def showBST(self):
-        table = []
-        for i in range(len(self.__branches)):
-            node = self.__branches[i]
-            table.append([f"tree[{i}]", node.left, node.data, node.right])
-        headers = ["Left", "Value", "Right"]
-        return tabulate(table, headers)
-
+      
     """ 'tree[i]' indicates the index of the child represented by the relevant pointers; None indicates that there's no child 
     on the relevant side. """
     def showSubTree(self, data, current_node=0):
@@ -126,6 +117,7 @@ class BinarySearchTree:
         right_child_index = self.__branches[current_node].right
         right_child_data = self.__branches[right_child_index].data
         return f"({data}) has two children: left child ({left_child_data}), right child ({right_child_data})."
+
 
     """ visit left sub-tree, root, right sub-tree (starting to the left of the root, output the corresponding data when passing beneath a node). """
     def inOrderTraversal(self, current_node = 0, visited = []):
@@ -156,22 +148,56 @@ class BinarySearchTree:
         visited.append(current_node)
         return [self.__branches[i].data for i in visited]
 
+
     def balanceBST(self):
-        pass
+        def obtainInOrder(node, nodes):
+            if node is not None:
+                obtainInOrder(self.__branches[node].left, nodes)
+                nodes.append(self.__branches[node])
+                obtainInOrder(self.__branches[node].right, nodes)
+
+        nodes = []
+        obtainInOrder(0, nodes)
+
+        def buildBalancedBST(start, end):
+            if start > end:
+                return None
+
+            mid = (start + end) // 2
+            node = nodes[mid]
+            node.left = buildBalancedBST(start, mid - 1)
+            node.right = buildBalancedBST(mid + 1, end)
+            return node
+
+        root = buildBalancedBST(0, len(nodes) - 1)
+        self.__branches = [None] * len(nodes)
+        for i, node in enumerate(nodes):
+            self.__branches[i] = node
+            node.left = None if node.left is None else nodes.index(node.left)
+            node.right = None if node.right is None else nodes.index(node.right)
+        return root
+
+    """ 'tree[i]' indicates the index of the child represented by the relevant pointers; None indicates that there's no child 
+    on the relevant side. """
+    def showBST(self):
+        table = []
+        for i in range(len(self.__branches)):
+            node = self.__branches[i]
+            table.append([f"tree[{i}]", node.left, node.data, node.right])
+        headers = ["Left", "Data", "Right"]
+        return tabulate(table, headers)
 
 tree = BinarySearchTree(17)
 
 tree.addNode(8)
 tree.addNode(4)
 tree.addNode(12)
+tree.addNode(5)
+tree.addNode(14)
+
 tree.addNode(22)
 tree.addNode(19)
-
-tree.addNode(14)
-tree.addNode(5)
 tree.addNode(30)
 tree.addNode(25)
 
 print(tree.showBST())
-
-print(tree.preOrderTraversal())
