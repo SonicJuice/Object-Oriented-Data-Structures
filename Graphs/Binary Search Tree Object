@@ -156,20 +156,3 @@ class BinarySearchTree:
             table.append([f"tree[{i}]", node.left, node.data, node.right])
         headers = ["Left", "Data", "Right"]
         return tabulate(table, headers)
-
-tree = BinarySearchTree(17)
-
-tree.addNode(8)
-tree.addNode(4)
-tree.addNode(12)
-tree.addNode(5)
-tree.addNode(14)
-
-tree.addNode(22)
-tree.addNode(19)
-tree.addNode(30)
-tree.addNode(25)
-
-print(tree.showBST())
-
-print(tree.showSubTree(17)))
