@@ -1,11 +1,12 @@
-from math import atan, pi, sqrt
+from math import acos, degrees, sqrt, atan2
+import matplotlib.pyplot as plt
 
 
 class Vector(object):
     def __init__(self, x, y):
         self.__x = x
         self.__y = y
-  
+    
     def getX(self):
         return self.__x
 
@@ -19,78 +20,82 @@ class Vector(object):
         self.__y = y
   
     def scalarMultiply(self, scalar):
-        newX = self.__x * scalar
-        newY = self.__y * scalar
-        return Vector(newX,newY)
+        new_x = self.__x * scalar
+        new_y = self.__y * scalar
+        return Vector(new_x, new_y)
         
     def add(self, other):
-        newX = self.getX() + other.getX()
-        newY = self.getY() + other.getY()
-        return Vector(newX,newY)
+        new_x = self.getX() + other.getX()
+        new_y = self.getY() + other.getY()
+        return Vector(new_x, new_y)
 
-    def getAngle(self, degrees=True):
-        rad = atan(self.getY() / self.getX())
-        if degrees:
-            return rad * (180 / pi)
+    """ describes a weighted sum of points w/ the condition that weights 'alpha' and 'gamma' must sum to 1. """
+    def convexCombination(self, other, alpha, gamma):
+        if alpha + gamma != 1:
+            raise ValueError("Coefficients must sum to 1.")
+        if alpha < 0 or gamma < 0:
+            raise ValueError("Neither coefficient can be negative.")
+        new_x = alpha * self.getX() + gamma * other.getX()
+        new_y = alpha * self.getY() + gamma * other.getY()
+        return Vector(new_x, new_y)
+
+    def showAngle(self, other, in_degrees = True):
+        dot_product = self.dotProduct(other)
+        magnitude_product = self.showMagnitude() * other.showMagnitude()
+        """ 'acos()' returns the arc (inverse) cosine of a value between -1 and 1. """
+        angle_radians = acos(dot_product / magnitude_product)
+        if in_degrees:
+            """ 'degrees' converts from radians, an angular measure defined such that an angle of one radian subtended from the center of a circle produces an arc of length 1."""
+            return degrees(angle_radians)
         else:
-            return rad
-          
-    def getMagnitude(self):
-        hypsq = self.getX()**2 + self.getY()**2
-        return sqrt(hypsq)
+            return angle_radians
 
+    def normalise(self):
+        magnitude = self.showMagnitude()
+        if magnitude == 0:
+            return Vector(0, 0)
+        else:
+            return Vector(self.getX() / magnitude, self.getY() / magnitude)
+          
+    def showMagnitude(self):
+        return sqrt(self.getX() ** 2 + self.getY() ** 2)
+
+    """ describes the sum of the products of the corresponding components in each vector. """
     def dotProduct(self, other):
         return self.getX() * other.getX() + self.getY() * other.getY()
 
-    def convexCombination(self, other, alpha):
-        u = self.scalarMultiply(alpha)
-        v = self.scalarMultiply(1 - alpha)
-        return u.add(v)
+        """ computes the convex hull (the smallest convex set that contains all points of a given set of '(x, y)' coordinates 'S') via Graham Scan. Convex describes a shape in which the counterclockwise traversal of its vertices may never acquire a clockwise rotation. """
+    def constructConvexHull(self, points):
+        self.__points = points
+        """ find the point w/ the lowest y-coord; consider the smaller x-coordinate if points share a y-coord. """
+        lowest = min(self.__points, key = lambda p: (p[1], p[0]))
 
-#--------------------------------------------------------
+        """ sort the remaining 'n - 1' points by counterclockwise polar angle (counterclockwise angle from the x-axis at which a point in the xy-plane lies) around 'lowest'. """
+        def polarAngle(p):
+            x, y = p[0] - lowest[0], p[1] - lowest[1]
+            """ 'atan2' returns the arc tangent (in radians) of 'y/x'. Unlike 'atan(y / x)', the signs of both coordinates are considered. """
+            return atan2(y, x)
 
-    """ computes the convex hull of the points self and other via Graham Scan """
-    def inConvexHull(self, other, point):
-        points = [self, other, point]
-        """ sorts the points in ascending y-coord, and then by 
-        ascending x-coord with the same y-coord """
-        points = sorted(points, key=lambda p: (p.getY(), p.getX()))
-        """ creates an empty stack and pushes the first 
-        two points onto it """
-        hull = [points[0], points[1]]
-        """ iterates over the remaining points and pushes each 
-        onto it"""
-        for p in points[2:]:
-            hull.append(p)
-            """ if current point causes stack to make a non-left turn, 
-            pop penultimate point until a left-turn is made. Ensures that 
-            the stack's points form the convex hull of the inputs """
-            while len(hull) > 2 and (hull[-1].getX() - hull[-2].getX()) * (hull[-2].getY() - hull[-3].getY()) > (hull[-2].getX() - hull[-3].getX()) * (hull[-1].getY() - hull[-2].getY()):
-                hull.pop(-2)
+        sorted_points = sorted([p for p in self.__points if p != lowest], key = polarAngle)
+        """ push first three points. """
+        stack = [lowest, sorted_points[0], sorted_points[1]]
 
-        """ for each edge, the input point is checked to
-        ensure it's on the same side of the edge as the rest of
-        the hull """ 
-        for i in range(len(hull)):
-            """ to do so, the cross product of the vector from
-            the previous to the current, as well as from the current 
-            to the next, point is calculated """
-            v1 = hull[(i - 1) % len(hull)]
-            v2 = hull[i]
-            v3 = hull[(i + 1) % len(hull)]
-            """ the input point lies within the hull if it's on the 
-            same side of all the edges """
-            if (v2.getY() > point.getY()) != (v3.getY() > point.getY()) and point.getX() < (v3.getX() - v2.getX()) * (point.getY() - v2.getY()) / (v3.getY() - v2.getY()) + v2.getX():
-                return False
-        return True
+        """ for each point 'p' in the sorted list (except for the first two which have already been pushed), check whether 'p' is to the left or right of the line formed by the last two points on the stack. If it's to the left of the line, push it, and if it's to the right, pop the last point off the stack and repeat the test w/ the new last point and 'p'. """
+        for p in sorted_points[2:]:
+            while len(stack) > 1 and (p[0] - stack[-2][0]) * (stack[-1][1] - stack[-2][1]) >= (p[1] - stack[-2][1]) * (stack[-1][0] - stack[-2][0]):
+                stack.pop()
+            stack.append(p)
+   
+        return stack[::-1]
 
-#------------------------------------------------------------
-        
-    def __str__(self):
-        output = "({},{})".format(self.getX(), self.getY())
-        return output
+    def displayConvexHull(self, points):
+        hull_points = self.constructConvexHull(points)
+        x = [p[0] for p in hull_points]
+        y = [p[1] for p in hull_points]
+        """ '.plot' plots lists across their respective axes; 'ro-' represents a plot using red circle markers. """
+        plt.plot(x, y, 'ro-')
+        """ '.show' displays the plot. """
+        plt.show()
 
-#-----------------------------------------------------------
-      
-v1 = Vector(2,2)
-v2 = Vector(6,-2)
+    def showVector(self):
+        return f"({round(self.getX(), 1)}, {round(self.getY(), 1)})"
