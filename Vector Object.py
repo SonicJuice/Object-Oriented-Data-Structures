@@ -71,12 +71,12 @@ class Vector(object):
         lowest = min(self.__points, key = lambda p: (p[1], p[0]))
 
         """ sort the remaining 'n - 1' points by counterclockwise polar angle (counterclockwise angle from the x-axis at which a point in the xy-plane lies) around 'lowest'. """
-        def __polarAngle(p):
+        def _polarAngle(p):
             x, y = p[0] - lowest[0], p[1] - lowest[1]
             """ 'atan2' returns the arc tangent (in radians) of 'y/x'. Unlike 'atan(y / x)', the signs of both coordinates are considered. """
             return atan2(y, x)
 
-        sorted_points = sorted([p for p in self.__points if p != lowest], key = __polarAngle)
+        sorted_points = sorted([p for p in self.__points if p != lowest], key = _polarAngle)
         """ push first three points. """
         stack = [lowest, sorted_points[0], sorted_points[1]]
 
