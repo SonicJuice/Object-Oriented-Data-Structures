@@ -65,7 +65,7 @@ class Vector(object):
         return self.getX() * other.getX() + self.getY() * other.getY()
 
         """ computes the convex hull (the smallest convex set that contains all points of a given set of '(x, y)' coordinates 'S') via Graham Scan. Convex describes a shape in which the counterclockwise traversal of its vertices may never acquire a clockwise rotation. """
-    def __constructConvexHull(self, points):
+    def constructConvexHull(self, points):
         self.__points = points
         """ find the point w/ the lowest y-coord; consider the smaller x-coordinate if points share a y-coord. """
         lowest = min(self.__points, key = lambda p: (p[1], p[0]))
@@ -89,7 +89,7 @@ class Vector(object):
         return stack[::-1]
 
     def displayConvexHull(self, points):
-        hull_points = self.__constructConvexHull(points)
+        hull_points = self.constructConvexHull(points)
         x = [p[0] for p in hull_points]
         y = [p[1] for p in hull_points]
         """ '.plot' plots lists across their respective axes; 'ro-' represents a plot using red circle markers. """
