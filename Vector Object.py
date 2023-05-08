@@ -65,18 +65,18 @@ class Vector(object):
         return self.getX() * other.getX() + self.getY() * other.getY()
 
         """ computes the convex hull (the smallest convex set that contains all points of a given set of '(x, y)' coordinates 'S') via Graham Scan. Convex describes a shape in which the counterclockwise traversal of its vertices may never acquire a clockwise rotation. """
-    def constructConvexHull(self, points):
+    def __constructConvexHull(self, points):
         self.__points = points
         """ find the point w/ the lowest y-coord; consider the smaller x-coordinate if points share a y-coord. """
         lowest = min(self.__points, key = lambda p: (p[1], p[0]))
 
         """ sort the remaining 'n - 1' points by counterclockwise polar angle (counterclockwise angle from the x-axis at which a point in the xy-plane lies) around 'lowest'. """
-        def polarAngle(p):
+        def __polarAngle(p):
             x, y = p[0] - lowest[0], p[1] - lowest[1]
             """ 'atan2' returns the arc tangent (in radians) of 'y/x'. Unlike 'atan(y / x)', the signs of both coordinates are considered. """
             return atan2(y, x)
 
-        sorted_points = sorted([p for p in self.__points if p != lowest], key = polarAngle)
+        sorted_points = sorted([p for p in self.__points if p != lowest], key = __polarAngle)
         """ push first three points. """
         stack = [lowest, sorted_points[0], sorted_points[1]]
 
@@ -89,7 +89,7 @@ class Vector(object):
         return stack[::-1]
 
     def displayConvexHull(self, points):
-        hull_points = self.constructConvexHull(points)
+        hull_points = self.__constructConvexHull(points)
         x = [p[0] for p in hull_points]
         y = [p[1] for p in hull_points]
         """ '.plot' plots lists across their respective axes; 'ro-' represents a plot using red circle markers. """
