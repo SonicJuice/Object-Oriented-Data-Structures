@@ -91,7 +91,7 @@ class BinarySearchTree:
       
     """ 'tree[i]' indicates the index of the child represented by the relevant pointers; None indicates that there's no child 
     on the relevant side. """
-    def showSubTree(self, data, current_node=0):
+    def showSubTree(self, data, current_node = 0):
         while current_node is not None and self.__branches[current_node].data != data:
             if self.__branches[current_node].data > data:
                 current_node = self.__branches[current_node].left
@@ -119,34 +119,43 @@ class BinarySearchTree:
         return f"({data}) has two children: left child ({left_child_data}), right child ({right_child_data})."
 
     """ visit left sub-tree, root, right sub-tree (starting to the left of the root, output the corresponding data when passing beneath a node). """
-    def inOrderTraversal(self, current_node = 0, visited = []):
+    def inOrderTraversal(self, current_node = 0, traversal = []):
+        if current_node is None:
+            return
         if self.__branches[current_node].left is not None:
-            self.inOrderTraversal(self.__branches[current_node].left, visited)
-        visited.append(current_node)
+            traversal = self.inOrderTraversal(self.__branches[current_node].left, traversal)
+        traversal.append(self.__branches[current_node].data)
         if self.__branches[current_node].right is not None:
-            self.inOrderTraversal(self.__branches[current_node].right, visited)
-        return [self.__branches[i].data for i in visited]
+            traversal = self.inOrderTraversal(self.__branches[current_node].right, traversal)
+        return traversal
 
     """ visit the root, left sub-tree, right sub-tree (starting to the left of the root, output the corresponding 
     data when passing to the left of a node). """
-    def preOrderTraversal(self, current_node = 0, visited = []):
-        visited.append(current_node)
+    def preOrderTraversal(self, current_node = 0, traversal = []):
+        if current_node is None:
+            current_node = 0
+        traversal.append(self.__branches[current_node].data)
         if self.__branches[current_node].left is not None:
-            self.preOrderTraversal(self.__branches[current_node].left, visited)
+            traversal = self.preOrderTraversal(self.__branches[current_node].left, traversal)
         if self.__branches[current_node].right is not None:
-            self.preOrderTraversal(self.__branches[current_node].right, visited)
-        return [self.__branches[i].data for i in visited]
+            traversal = self.preOrderTraversal(self.__branches[current_node].right, traversal)
+        return traversal
 
     """ visit left sub-tree, right sub-tree, root (starting to the right of the root, output the corresponding 
     data when passing to the right a node). """
-    def postOrderTraversal(self, current_node = 0, visited = []):
+    def postOrderTraversal(self, current_node = 0, traversal = []):
+        if current_node is None:
+            current_node = 0
         if self.__branches[current_node].left is not None:
-            self.postOrderTraversal(self.__branches[current_node].left, visited)
+            traversal = self.postOrderTraversal(self.__branches[current_node].left, traversal)
         if self.__branches[current_node].right is not None:
-            self.postOrderTravesal(self.__branches[current_node].right, visited)
-        visited.append(current_node)
-        return [self.__branches[i].data for i in visited]
+            traversal = self.postOrderTraversal(self.__branches[current_node].right, traversal)
+        traversal.append(self.__branches[current_node].data)
+        return traversal
 
+    def balanceBST(self):  
+        pass
+      
     """ 'tree[i]' indicates the index of the child represented by the relevant pointers; None indicates that there's no child 
     on the relevant side. """
     def showBST(self):
