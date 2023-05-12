@@ -21,8 +21,9 @@ class BinarySearchTree:
 
     def addNode(self, data, current_node = 0):
         new_node = Node(data)
-        """ iteratively moves down the tree based on the value of 'data'. If the data is < the current node's data, it goes to the left child if it exists, or creates a new left child; if it's >=
-current node's data, it does the same in the context of the right child. """
+        """ iteratively moves down the tree based on the value of 'data'. If the data is < the current node's data, 
+        it goes to the left child if it exists, or creates a new left child; if it's >= current node's data, it does the same 
+        in the context of the right child. """
         while True:
             if self.__branches[current_node].data > data:
                 if self.__branches[current_node].left is None:
@@ -67,7 +68,8 @@ current node's data, it does the same in the context of the right child. """
             else:
                 self.__branches[parent_node].right = child_index
 
-                """ if it has two children, it finds the node's successor (i.e., the smallest node in the right subtree), replaces the node's data w/ the successor's data, and then removes the successor. """
+                """ if it has two children, it finds the node's successor (i.e., the smallest node in the right subtree),
+                replaces the node's data w/ the successor's data, and then removes the successor. """
         else:
             successor_parent = current_node
             successor = self.__branches[current_node].right
@@ -121,7 +123,8 @@ current node's data, it does the same in the context of the right child. """
         right_child_data = self.__branches[right_child_index].data
         return f"({data}) has two children: left child ({left_child_data}), right child ({right_child_data})."
 
-    """ visit left sub-tree, root, right sub-tree (starting to the left of the root, output the corresponding data when passing beneath a node). """
+    """ visit left sub-tree, root, right sub-tree (starting to the left of the root, output the 
+    corresponding data when passing beneath a node). """
     def inOrderTraversal(self, current_node = 0):
         if current_node is None:
             return []
@@ -131,7 +134,8 @@ current node's data, it does the same in the context of the right child. """
         traversal += self.inOrderTraversal(self.__branches[current_node].right)
         return traversal
 
-    """ visit the root, left sub-tree, right sub-tree (starting to the left of the root, output the corresponding data when passing to the left of a node). """
+    """ visit the root, left sub-tree, right sub-tree (starting to the left of the root, output the corresponding data 
+    when passing to the left of a node). """
     def preOrderTraversal(self, current_node = 0):
         if current_node is None:
             return []
@@ -141,7 +145,8 @@ current node's data, it does the same in the context of the right child. """
         traversal += self.preOrderTraversal(self.__branches[current_node].right)
         return traversal
 
-    """ visit left sub-tree, right sub-tree, root (starting to the right of the root, output the corresponding data when passing to the right a node). """
+    """ visit left sub-tree, right sub-tree, root (starting to the right of the root, output the corresponding data
+    when passing to the right a node). """
     def postOrderTraversal(self, current_node = 0):
         if current_node is None:
             return []
@@ -158,20 +163,24 @@ current node's data, it does the same in the context of the right child. """
         def _constructBalancedBST(start, end):
             if start > end:
                 return
-            """ calculate the middle index between the start and end indices '(start + end) // 2', being the index of the node that will become the root of the subtree. create a new 'Node' with the value of the node at the middle index. """
+            """ calculate the middle index between the start and end indices '(start + end) // 2', being the index of the node 
+            that will become the root of the subtree. create a new 'Node' with the value of the node at the middle index. """
             mid = (start + end) // 2
             node = Node(sorted_nodes[mid])
-            """ recursively call _constructBalancedBST for the left half of the range, from start to mid - 1, and assign the returned node to the left and 'right' attributes of the current node. """
+            """ recursively call _constructBalancedBST for the left half of the range, from start to mid - 1, and assign 
+            the returned node to the left and 'right' attributes of the current node. """
             node.left = _constructBalancedBST(start, mid - 1)
             node.right = _constructBalancedBST(mid + 1, end)
             return node
-        """ call the '_constructBalancedBST' function w/ parameters to construct a balanced binary search tree w/ the sorted nodes. """
+        """ call the '_constructBalancedBST' function w/ parameters to construct a balanced BST
+        w/ the sorted nodes. """
         new_root = _constructBalancedBST(0, len(sorted_nodes) - 1)
         self.__branches = []
         
         def _depthFirst(node):
             if node is not None:
-                """ DF that adds each node to '__branches' and returns a new node index; this is used to track nodes after rebalancing. Subtrees of the node are then recursively traversed. """
+                """ DF that adds each node to '__branches' and returns a new node index; this is used to track nodes 
+                after rebalancing. Subtrees of the node are then recursively traversed. """
                 new_node_index = len(self.__branches)
                 self.__branches.append(node)
                 node.left = _depthFirst(node.left)
