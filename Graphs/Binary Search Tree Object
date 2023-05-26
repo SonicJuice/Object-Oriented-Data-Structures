@@ -160,33 +160,33 @@ class BinarySearchTree:
     def balanceBST(self):
         sorted_nodes = self.inOrderTraversal()
 
-        def _constructBalancedBST(start, end):
+        def __constructBalancedBST(start, end):
             if start > end:
                 return
             """ calculate the middle index between the start and end indices '(start + end) // 2', being the index of the node 
             that will become the root of the subtree. create a new 'Node' with the value of the node at the middle index. """
             mid = (start + end) // 2
             node = Node(sorted_nodes[mid])
-            """ recursively call _constructBalancedBST for the left half of the range, from start to mid - 1, and assign 
+            """ recursively call __constructBalancedBST for the left half of the range, from start to mid - 1, and assign 
             the returned node to the left and 'right' attributes of the current node. """
-            node.left = _constructBalancedBST(start, mid - 1)
-            node.right = _constructBalancedBST(mid + 1, end)
+            node.left = __constructBalancedBST(start, mid - 1)
+            node.right = __constructBalancedBST(mid + 1, end)
             return node
-        """ call the '_constructBalancedBST' function w/ parameters to construct a balanced BST
+        """ call the '__constructBalancedBST' function w/ parameters to construct a balanced BST
         w/ the sorted nodes. """
-        new_root = _constructBalancedBST(0, len(sorted_nodes) - 1)
+        new_root = __constructBalancedBST(0, len(sorted_nodes) - 1)
         self.__branches = []
         
-        def _depthFirst(node):
+        def __depthFirst(node):
             if node is not None:
                 """ DF that adds each node to '__branches' and returns a new node index; this is used to track nodes 
                 after rebalancing. Subtrees of the node are then recursively traversed. """
                 new_node_index = len(self.__branches)
                 self.__branches.append(node)
-                node.left = _depthFirst(node.left)
-                node.right = _depthFirst(node.right)
+                node.left = __depthFirst(node.left)
+                node.right = __depthFirst(node.right)
                 return new_node_index
-        _depthFirst(new_root)
+        __depthFirst(new_root)
   
     """ 'tree[i]' indicates the index of the child represented by the relevant pointers; None indicates that there's no child 
     on the relevant side. """
