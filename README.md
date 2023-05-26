@@ -11,8 +11,10 @@ These are:
 
 - Stack
 
+- Hash Table (utilising the Murmur3 hashing algorithm for formulating deterministic hash indexes that minimise collision rate)
+
 - Graph (utilising an adjacency list for either directed or undirected graphs, w/ depth-first and breadth-first traversal methods, as well as Dijsktra's algorithm)
 
 - Binary Search Tree (w/ in, pre, and post-order traversal methods, as well as a balancing method)
 
-- Vector (w/ Graham Scan to compute the convex hull created by a list of instances. This can then be displayed via matplotlib functions)
+- Vector (w/ Graham Scan to compute the convex hull created by a list of instances, which can then be displayed via matplotlib functions)
