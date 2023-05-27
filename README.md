@@ -9,6 +9,8 @@ These are:
 
 - Priority Queue (utilising a heap to maintain logical element order via heap rules)
 
+- Linked List (w/ double linking for bi-directional node traversal and, therefore 'O(1)' TC for the 'addNode', 'addNodeAt' and 'deleteNode' methods)
+
 - Stack
 
 - Hash Table (utilising the Murmur3 hashing algorithm for formulating deterministic hash indexes that minimise collision rate)
