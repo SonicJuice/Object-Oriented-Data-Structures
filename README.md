@@ -1,5 +1,5 @@
-# AQA A-Level CS ADT Implementations
-OO Python implementations of all ADTs included in the AQA A-Level CS Specification!
+# OO ADT Implementations
+OO Python implementations of all ADTs in the AQA A-Level CS Specification!
 
 These are:
 
