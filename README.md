@@ -1,5 +1,5 @@
-# OO ADT Implementations
-OO Python implementations of all ADTs in the AQA A-Level CS Specification!
+# Object-Orientated Abstract Data Types
+Object-orientated implementations of various abstract data types in Python!
 
 These are:
 
