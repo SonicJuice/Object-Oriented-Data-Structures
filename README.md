@@ -1,4 +1,4 @@
-# Object-Orientated Abstract Data Types
+# Object-Orientated Abstract Data Types in Python
 Object-orientated implementations of various abstract data types in Python!
 
 These are:
