@@ -7,16 +7,16 @@ These are:
 
 - Circular Queue
 
-- Priority Queue (utilising a heap to maintain logical element order via heap rules)
+- Priority Queue (utilising heap rules to maintain a logical order)
 
-- Linked List (w/ double linking for bi-directional node traversal and, therefore 'O(1)' TC for the 'addNode', 'addNodeAt' and 'deleteNode' methods)
+- Linked List (w/ double linking for bi-directional node traversal and, therefore, O(1) insertion and deletion)
 
 - Stack
 
-- Hash Table (utilising the Murmur3 hashing algorithm for formulating deterministic hash indexes that minimise collision rate)
+- Hash Table (utilising Murmur3 hashing for deterministic hash indexes that minimise collision rate)
 
 - Graph (utilising an adjacency list for either directed or undirected graphs, w/ depth-first and breadth-first traversal methods, as well as Dijsktra's algorithm)
 
 - Binary Search Tree (w/ in, pre, and post-order traversal methods, as well as a balancing method)
 
-- Vector (w/ Graham Scan to compute the convex hull created by a list of instances, which can then be displayed via matplotlib functions)
+- Vector (w/ Graham Scan to compute the convex hulls, which can then be displayed via matplotlib)
