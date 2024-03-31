@@ -1,7 +1,6 @@
 
  
 class CircularQueue(object):
-
     def __init__(self,qSize):
         self.__q = [None] * qSize
         self.__front = 0
