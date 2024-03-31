@@ -1,13 +1,12 @@
 from collections import deque
 from heapq import heappop, heappush
 
+
 class Node:
     def __init__(self, name):
         self.__name = name
         self.edges = {}
-
-#------------------------------------------------------------------------
-
+        
 
 class Graph:
     """ a graph is a set of nodes connected by edges, which may be directed/undirected and weighted/unweighted. 
@@ -78,8 +77,8 @@ class Graph:
             raise ValueError("Edge does not exist.")
 
     def depthFirst(self, node, visited = None):
-        """ utilises recursive calls to traverse a graph from the current node, going as far down as possible before backtracking. The given node 
-        is added to 'visited'; if the neighbouring node hasn't been visited, pass it as an argument into the recursion. This continues until 
+        """ utilises recursive calls to traverse a graph from the current node, going as far down as possible before backtracking. 
+        The given node is added to 'visited'; if the neighbouring node hasn't been visited, pass it as an argument into the recursion. This continues until 
         all nodes reachable from the starting node have been visited. """
         if node not in self.__nodes:
             raise ValueError("Node doesn't exist.")
@@ -97,9 +96,10 @@ class Graph:
         return result
     
     def breadthFirst(self, node):
-        """ utilises a queue to explore nodes at the same depth before ascending. The given node is added to 'queue' and 'visited', before a loop 
-        is entered until 'queue' is empty. In each iteration, dequeue the front node and explore its neighbours; for each, if it hasn't been visited, 
-        enqueue it to the back and add it to 'visited'. This continues until all nodes reachable from the starting node have been visited. """
+        """ utilises a queue to explore nodes at the same depth before ascending. The given node is added to 
+        'queue' and 'visited', before a loop is entered until 'queue' is empty. In each iteration, dequeue the front node 
+        and explore its neighbours; for each, if it hasn't been visited, enqueue it to the back and add it to 'visited'. 
+        This continues until all nodes reachable from the starting node have been visited. """
         if node not in self.__nodes:
             raise ValueError("Node doesn't exist.")
 
@@ -139,8 +139,9 @@ class Graph:
             if dist > distances[current_node]:
                 continue
 
-            """ for each neighbor 'v' of 'u', calculate a TD 'alt' as the sum of the distance to 'u' and the weight of the edge connecting 'u' and 'v'. 
-            If this is < than the current distance to 'v' in 'distances', update the distance in 'distances' and add 'v' to 'pq' w/ priority 'alt'. """
+            """ for each neighbor 'v' of 'u', calculate a TD 'alt' as the sum of the distance to 'u' and 
+            the weight of the edge connecting 'u' and 'v'. If this is < than the current distance to 'v' in 'distances', 
+            update the distance in 'distances' and add 'v' to 'pq' w/ priority 'alt'. """
             for neighbour, weight in self.__nodes[current_node].edges.items():
                 tentative_distance = dist + weight
                 if tentative_distance < distances[neighbour]:
