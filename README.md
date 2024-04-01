@@ -13,7 +13,7 @@ These include:
 
 - Stack
 
-- Hash Table (utilising Murmur3 hashing for deterministic hash indexes that minimise collision rate)
+- Hash Table (utilising Murmur3 for deterministic indexes that minimise collision rate)
 
 - Graph (utilising an adjacency list for either directed or undirected graphs, w/ depth-first and breadth-first traversal methods, as well as Dijsktra's algorithm)
 
