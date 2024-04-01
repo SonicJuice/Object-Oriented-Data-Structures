@@ -3,7 +3,7 @@ Object-oriented implementations of various abstract data types!
 
 These include:
 
-- Linear Queue
+- Queue
 
 - Circular Queue
 
