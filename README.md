@@ -9,14 +9,14 @@ These include:
 
 - Priority Queue (utilising heap rules to maintain a logical order)
 
-- Linked List (w/ double linking for bi-directional node traversal and, therefore, O(1) insertion and deletion)
+- Linked List (utilising double linking for bi-directional node traversal)
 
 - Stack
 
 - Hash Table (utilising Murmur3 for deterministic indexes that minimise collision rate)
 
-- Graph (utilising an adjacency list for either directed or undirected graphs, w/ depth-first and breadth-first traversal methods, as well as Dijsktra's algorithm)
+- Graph (utilising an adjacency list for directed or undirected graphs, depth-first and breadth-first traversal, and Dijsktra's algorithm)
 
-- Binary Search Tree (w/ in, pre, and post-order traversal methods, as well as a balancing method)
+- Binary Search Tree (utilising in-, pre-, and post-order traversal, and a balancing method)
 
-- Vector (w/ Graham Scan to compute the convex hulls, which can then be displayed via matplotlib)
+- Vector (utilising Graham Scan to compute convex hulls viewable with which matplotlib)
