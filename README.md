@@ -1,4 +1,4 @@
-# Python Abstract Data Types
+# Python ADTs
 Object-oriented implementations of various abstract data types!
 
 These include:
