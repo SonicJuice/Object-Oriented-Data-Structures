@@ -1,7 +1,7 @@
-# Python Object-Oriented Abstract Data Types
-Object-oriented implementations of various abstract data types in Python!
+# Python Abstract Data Types
+Object-oriented implementations of various abstract data types!
 
-These are:
+These include:
 
 - Linear Queue
 
