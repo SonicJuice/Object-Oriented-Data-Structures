@@ -1,5 +1,5 @@
+import heapq
 from collections import deque
-from heapq import heappop, heappush
 
 
 class Node:
@@ -15,26 +15,26 @@ class Graph:
         self.__nodes = {}
         self.__directed = directed
 
-    def addNode(self, new_node):
-        """ if the new node isn't yet in the AL, add the new node as a key in '__nodes' w/ an empty dictionary as its value, 
-      representing no outgoing edges from the new node. """
+    def add_node(self, new_node):
+        """ if the new node isn't yet in the AL, add the new node as a key in __nodes w/ an empty dictionary, 
+        representing no outgoing edges from the new node. """
         if new_node not in self.__nodes:
             self.__nodes[new_node] = Node(new_node)
         else:
             raise ValueError("Node already exists.")
 
-    def deleteNode(self, node_to_delete):
+    def delete_node(self, node_to_delete):
         if node_to_delete in self.__nodes:
             del self.__nodes[node_to_delete]
         else:
             raise ValueError("Node doesn't exist.")
 
-    def listNodes(self):
-        """" print all keys representing the nodes. """
+    def list_nodes(self):
+        """ print all keys representing the nodes. """
         return " ".join(self.__nodes.keys())
 
     """ when constructing graphs, ensure to add edges such that each node is accessible from the origin. """
-    def addEdge(self, origin, destination, weight):
+    def add_edge(self, origin, destination, weight):
         if origin not in self.__nodes:
             raise ValueError("Origin doesn't exist.")
         if destination not in self.__nodes:
@@ -45,7 +45,7 @@ class Graph:
         if not self.__directed:
             self.__nodes[destination].edges[origin] = weight
 
-    def deleteEdge(self, origin, destination):
+    def delete_edge(self, origin, destination):
         if origin not in self.__nodes:
             raise ValueError("Origin doesn't exist.")
         if destination not in self.__nodes:
@@ -55,7 +55,7 @@ class Graph:
         if not self.__directed and origin in self.__nodes[destination].edges:
             del self.__nodes[destination].edges[origin]
 
-    def alterEdge(self, origin, destination, weight):
+    def alter_edge(self, origin, destination, weight):
         """ check if both nodes exist, before checking if there's an edge between them and updating it. 
         If the graph to be implemented is undirected, this occurs for the edge created between both nodes. """
         if origin not in self.__nodes:
@@ -66,7 +66,7 @@ class Graph:
         if not self.__directed:
             self.__nodes[destination].edges[origin] = weight
 
-    def showConnection(self, origin, destination):
+    def show_connection(self, origin, destination):
         if origin not in self.__nodes:
             raise ValueError("Origin doesn't exist.")
         if destination not in self.__nodes:
@@ -76,10 +76,10 @@ class Graph:
         else:
             raise ValueError("Edge does not exist.")
 
-    def depthFirst(self, node, visited = None):
+    def depth_first_search(self, node, visited = None):
         """ utilises recursive calls to traverse a graph from the current node, going as far down as possible before backtracking. 
-        The given node is added to 'visited'; if the neighbouring node hasn't been visited, pass it as an argument into the recursion. This continues until 
-        all nodes reachable from the starting node have been visited. """
+        The given node is added to 'visited'; if the neighbouring node hasn't been visited, pass it as an argument into the recursion. 
+        This continues until all nodes reachable from the starting node have been visited. """
         if node not in self.__nodes:
             raise ValueError("Node doesn't exist.")
         
@@ -91,11 +91,10 @@ class Graph:
         
         for neighbour in self.__nodes[node].edges:
             if neighbour not in visited:
-                result += self.depthFirst(neighbour, visited)
-        
+                result += self.depth_first_search(neighbour, visited)
         return result
     
-    def breadthFirst(self, node):
+    def breadth_first_search(self, node):
         """ utilises a queue to explore nodes at the same depth before ascending. The given node is added to 
         'queue' and 'visited', before a loop is entered until 'queue' is empty. In each iteration, dequeue the front node 
         and explore its neighbours; for each, if it hasn't been visited, enqueue it to the back and add it to 'visited'. 
@@ -120,7 +119,7 @@ class Graph:
                   
         return result
 
-    def dijkstrasShortestPath(self, node):
+    def shortest_path(self, node):
         if node not in self.__nodes:
             raise ValueError("Node doesn't exist.")
 
@@ -133,8 +132,8 @@ class Graph:
 
         """ while the pq isn't empty, extract the node w/ the smallest TD 'u'' from 'pq'. """
         while pq:
-            """ 'heappop' removes and returns the smallest element, whilst the order is adjusted as to maintain the heap. """
-            dist, current_node = heappop(pq)
+            """ 'heapq.heappop' removes and returns the smallest element, whilst the order is adjusted as to maintain the heap. """
+            dist, current_node = heapq.heappop(pq)
         
             if dist > distances[current_node]:
                 continue
@@ -146,7 +145,6 @@ class Graph:
                 tentative_distance = dist + weight
                 if tentative_distance < distances[neighbour]:
                     distances[neighbour] = tentative_distance
-                    """ 'heappush' inserts an element into the heap whilst preserving OPs. """
-                    heappush(pq, (tentative_distance, neighbour))
-    
+                    """ 'heapq.heappush' inserts an element into the heap whilst preserving OPs. """
+                    heapq.heappush(pq, (tentative_distance, neighbour))
         return distances
