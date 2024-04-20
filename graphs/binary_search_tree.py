@@ -7,8 +7,6 @@ class Node:
         self.data = data
         self.right = None
 
-#------------------------------------------------------------------
-
 
 """ trees are connected, undirected graph wo/ cycles; this means that it's impossible to find a path which 
 returns to the start node without traversing an edge twice. Each node in a binary search tree can have up two children, 
@@ -19,7 +17,7 @@ class BinarySearchTree:
         root = Node(root_data)
         self.__branches.append(root)
 
-    def addNode(self, data, current_node = 0):
+    def add_node(self, data, current_node = 0):
         new_node = Node(data)
         """ iteratively moves down the tree based on the value of 'data'. If the data is < the current node's data, 
         it goes to the left child if it exists, or creates a new left child; if it's >= current node's data, it does the same 
@@ -38,7 +36,7 @@ class BinarySearchTree:
                     return
                 current_node = self.__branches[current_node].right
 
-    def deleteNode(self, data, current_node = 0, parent_node = None):
+    def delete_node(self, data, current_node = 0, parent_node = None):
         while current_node is not None and self.__branches[current_node].data != data:
             parent_node = current_node
             if self.__branches[current_node].data > data:
@@ -83,7 +81,7 @@ class BinarySearchTree:
             else:
                 self.__branches[successor_parent].right = self.__branches[successor].right
               
-    def showSubTree(self, data, current_node = 0):
+    def show_sub_tree(self, data, current_node = 0):
         while current_node is not None and self.__branches[current_node].data != data:
             if self.__branches[current_node].data > data:
                 current_node = self.__branches[current_node].left
@@ -93,7 +91,9 @@ class BinarySearchTree:
         if current_node is None:
             raise ValueError("Node doesn't exist.")
 
-        """ describes the subtree rooted at the node w/ the specified value, first traversing the tree to find the node with the specified value. Once it finds the node, determine the type of node based on whether it's a leaf, has one child, or has two children, and returns a string describing the node. """
+        """ describes the subtree rooted at the node w/ the specified value, first traversing the tree to find the node with 
+        the specified value. Once it finds the node, determine the type of node based on whether it's a leaf, has one child, or 
+        has two children, and returns a string describing the node. """
         if current_node == 0:
             left_child_index = self.__branches[current_node].left
             left_child_data = self.__branches[left_child_index].data if left_child_index is not None else None
@@ -125,72 +125,72 @@ class BinarySearchTree:
 
     """ visit left sub-tree, root, right sub-tree (starting to the left of the root, output the 
     corresponding data when passing beneath a node). """
-    def inOrderTraversal(self, current_node = 0):
+    def in_order_traversal(self, current_node = 0):
         if current_node is None:
             return []
         traversal = []
-        traversal += self.inOrderTraversal(self.__branches[current_node].left)
+        traversal += self.in_order_traversal(self.__branches[current_node].left)
         traversal.append(self.__branches[current_node].data)
-        traversal += self.inOrderTraversal(self.__branches[current_node].right)
+        traversal += self.in_order_traversal(self.__branches[current_node].right)
         return traversal
 
     """ visit the root, left sub-tree, right sub-tree (starting to the left of the root, output the corresponding data 
     when passing to the left of a node). """
-    def preOrderTraversal(self, current_node = 0):
+    def pre_order_traversal(self, current_node = 0):
         if current_node is None:
             return []
         traversal = []
         traversal.append(self.__branches[current_node].data)
-        traversal += self.preOrderTraversal(self.__branches[current_node].left)
-        traversal += self.preOrderTraversal(self.__branches[current_node].right)
+        traversal += self.pre_order_traversal(self.__branches[current_node].left)
+        traversal += self.pre_order_traversal(self.__branches[current_node].right)
         return traversal
 
     """ visit left sub-tree, right sub-tree, root (starting to the right of the root, output the corresponding data
     when passing to the right a node). """
-    def postOrderTraversal(self, current_node = 0):
+    def post_order_traversal(self, current_node = 0):
         if current_node is None:
             return []
         traversal = []
-        traversal += self.postOrderTraversal(self.__branches[current_node].left)
-        traversal += self.postOrderTraversal(self.__branches[current_node].right)
+        traversal += self.post_order_traversal(self.__branches[current_node].left)
+        traversal += self.post_order_traversal(self.__branches[current_node].right)
         traversal.append(self.__branches[current_node].data)
         return traversal
 
-    """ BSTs are said to balanced if the heights of the left and right subtrees of any node differ by at most one. """
-    def balanceBST(self):
-        sorted_nodes = self.inOrderTraversal()
+    """ BSTs balanced if the heights of the left and right subtrees of any node differ by at most one. """
+    def balance_tree(self):
+        sorted_nodes = self.in_order_traversal()
 
-        def __constructBalancedBST(start, end):
+        def __construct_balanced_tree(start, end):
             if start > end:
                 return
             """ calculate the middle index between the start and end indices '(start + end) // 2', being the index of the node 
             that will become the root of the subtree. create a new 'Node' with the value of the node at the middle index. """
             mid = (start + end) // 2
             node = Node(sorted_nodes[mid])
-            """ recursively call __constructBalancedBST for the left half of the range, from start to mid - 1, and assign 
+            """ recursively call __construct_balanced_tree for the left half of the range, from start to mid - 1, and assign 
             the returned node to the left and 'right' attributes of the current node. """
-            node.left = __constructBalancedBST(start, mid - 1)
-            node.right = __constructBalancedBST(mid + 1, end)
+            node.left = __construct_balanced_tree(start, mid - 1)
+            node.right = __construct_balanced_tree(mid + 1, end)
             return node
-        """ call the '__constructBalancedBST' function w/ parameters to construct a balanced BST
+        """ call the '__construct_balanced_tree' function w/ parameters to construct a balanced BST
         w/ the sorted nodes. """
-        new_root = __constructBalancedBST(0, len(sorted_nodes) - 1)
+        new_root = __construct_balanced_tree(0, len(sorted_nodes) - 1)
         self.__branches = []
         
-        def __depthFirst(node):
+        def __depth_first_traversal(node):
             if node is not None:
                 """ DF that adds each node to '__branches' and returns a new node index; this is used to track nodes 
                 after rebalancing. Subtrees of the node are then recursively traversed. """
                 new_node_index = len(self.__branches)
                 self.__branches.append(node)
-                node.left = __depthFirst(node.left)
-                node.right = __depthFirst(node.right)
+                node.left = __depth_first_traversal(node.left)
+                node.right = __depth_first_traversal(node.right)
                 return new_node_index
-        __depthFirst(new_root)
+        __depth_first_traversal(new_root)
   
     """ 'tree[i]' indicates the index of the child represented by the relevant pointers; None indicates that there's no child 
     on the relevant side. """
-    def showBST(self):
+    def show_tree(self):
         table = []
         for i in range(len(self.__branches)):
             node = self.__branches[i]
