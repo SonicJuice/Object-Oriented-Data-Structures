@@ -1,5 +1,4 @@
 import math
-from math import acos, degrees, sqrt, atan2
 import matplotlib.pyplot as plt
 
 
