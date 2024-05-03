@@ -1,42 +1,58 @@
+import threading
+from collections import deque
 
 
-class Queue(object):
-    """ constructor method initializes the queue with a given size qSize. It creates a list of Nones of 'q_size' to represent 
-    the queue, initialises the front and rear pointers, the size of the queue, and its maximum size.  """
-    def __init__(self, q_size):
-        self.q = [None] * q_size
-        self.front = 0
-        self.rear = -1
-        self.size = 0
-        self.max_size = q_size
+class Queue:
+    def __init__(self, maxsize=0):
+        self.maxsize = maxsize
+        """ threading.semaphore() creates a synchronisation primitive (mechanism controlling 
+        the access of multiple processes to shared resources in a concurrent system) that 
+        manages a counter which is decremented/incremented by each acquire()/release() call. 
+        The counter can never go below zero; when acquire() finds that it is zero, it blocks, 
+        waiting until some other thread calls release(). """
+        self._count = threading.Semaphore(0)
+        self._init()
 
     def enqueue(self, item):
-        """ adds an element item to the rear, first checking if the queue is full. Otherwise, it increments the rear pointer, 
-        assigns the item to the rear of the queue and increments the size of the queue, and returns True. """
-        if self.is_full():
-            raise ValueError("Queue is full.")
+        if self.maxsize == 0 or self.qsize() < self.maxsize:
+            self._enqueue(item)
+            """ threading.semaphore.release(n=1) releases a semaphore, incrementing the 
+            internal counter by n. When it was zero on entry and other threads are waiting for 
+            it to become > zero again, wake up n threads. """
+            self._count.release()
         else:
-            self.rear += 1
-            self.q[self.rear] = item
-            self.size += 1
+            raise ValueError("Queue is full.")
 
     def dequeue(self):
-        """ removes and returns the element from the front, first checking if the queue is empty. Otherwise, it decrements the size of 
-        the queue, retrieves the element from the front of the queue, increments the front pointer, and returns the retrieved 
-        element. """
-        if self.is_empty():
+        """ threading.semaphore.acquire() acquirea a semaphore. If the internal counter > zero 
+        on entry, decrement it by one and return True immediately. If the internal counter is 
+        zero on entry, block until awoken by a call to release(). Once awoken (and the counter 
+        > 0), decrement the counter by 1 and return True. Exactly one thread will be awoken by 
+        each call to release(). """
+        if not self._count.acquire():
             raise ValueError("Queue is empty.")
-        else:
-            self.size -= 1
-            item = self.q[self.front]
-            self.front += 1
-            return item
+        return self._dequeue()
 
-    def is_full(self):
-        return self.size == self.max_size
+    def empty(self):
+        """ returns True if the queue is empty. """
+        return not self.queue
 
-    def is_empty(self):
-        return self.size == 0
+    def full(self):
+        """ returns True if the queue has reached maxsize. """
+        return self.maxsize != 0 and self.qsize() >= self.maxsize
 
-    def show_queue(self):
-        return " ".join(str(item) for item in self.q[self.front:self.rear + 1])
+    def qsize(self):
+        """ return the current size of the queue. """
+        return len(self.queue)
+
+    def _init(self):
+        self.queue = deque()
+
+    def _enqueue(self, item):
+        """ a deque is a container with thread-safe left and right-end appending and popping 
+        methods. deque.append() adds an item to the right end of the deque. """
+        self.queue.append(item)
+
+    def _dequeue(self):
+        """ dequeue.popleft() removes and returns the left-most item. """
+        return self.queue.popleft()
