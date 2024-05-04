@@ -21,7 +21,7 @@ class Queue:
             it to become > zero again, wake up n threads. """
             self._count.release()
         else:
-            raise ValueError("Queue is full.")
+            raise IndexError("Queue is full")
 
     def dequeue(self):
         """ threading.semaphore.acquire() acquirea a semaphore. If the internal counter > zero 
@@ -30,7 +30,7 @@ class Queue:
         > 0), decrement the counter by 1 and return True. Exactly one thread will be awoken by 
         each call to release(). """
         if not self._count.acquire():
-            raise ValueError("Queue is empty.")
+            raise IndexError("Queue is empty")
         return self._dequeue()
 
     def empty(self):
@@ -49,9 +49,9 @@ class Queue:
         self.queue = deque()
 
     def _enqueue(self, item):
-        """ a deque (double-ended queue) is a container with thread-safe left and right-end 
-        appending and popping methods. deque.append() adds an item to the right end of the 
-        deque. """
+        """ deques (double-ended queues) are thread-safe containers supporting thread-safe 
+        left- and right-end appending and popping. deque.append() adds an item to the right 
+        end of the deque. """
         self.queue.append(item)
 
     def _dequeue(self):
