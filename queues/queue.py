@@ -46,12 +46,12 @@ class Queue:
         return len(self.queue)
 
     def _init(self):
+        """ deques (double-ended queues) are thread-safe containers supporting thread-safe 
+        left- and right-end appending and popping. """
         self.queue = deque()
 
     def _enqueue(self, item):
-        """ deques (double-ended queues) are thread-safe containers supporting thread-safe 
-        left- and right-end appending and popping. deque.append() adds an item to the right 
-        end of the deque. """
+        """ deque.append() adds an item to the right end of the deque. """
         self.queue.append(item)
 
     def _dequeue(self):
