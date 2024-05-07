@@ -44,7 +44,7 @@ class Queue:
             unfinished = self.unfinished_tasks - 1
             if unfinished <= 0:
                 if unfinished < 0:
-                    raise ValueError('task_done() called too many times')
+                    raise ValueError("task_done() called too many times")
                 self.all_tasks_done.notify_all()
             self.unfinished_tasks = unfinished
 
