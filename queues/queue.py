@@ -19,12 +19,13 @@ class Queue:
         self.maxsize = maxsize
         self._init()
 
-        """ mutual exclusion must be held whenever the queue is mutating. All methods that 
-        acquire mutex must release it before returning. Mutex is shared between the three 
-        conditions, so acquiring and releasing the conditions does so for mutex. """
+        """ the threading.Lock() class helps prevent race conditions by giving only one thread 
+        access to the critical section of code or shared resource. Other threads attempting to 
+        acquire the lock are blocked until it's released by the owning thread. """
         self.mutex = threading.Lock()
         """ notify not_empty whenever an item is added to the queue; a thread waiting to 
-        dequeue is notified then. """
+        dequeue is notified then. the threading.Condition() class implements a condition variable 
+        objects. This allows one or more threads to wait until they are notified by another. """
         self.not_empty = threading.Condition(self.mutex)
         """ notify not_full whenever an item is removed from the queue; a thread waiting to 
         enqueue is notified then. """
@@ -32,19 +33,21 @@ class Queue:
         """ notify all_tasks_done whenever the number of unfinished tasks drops to zero; 
         thread waiting to join() is notified to resume. """
         self.all_tasks_done = threading.Condition(self.mutex)
-        
+
         self.unfinished_tasks = 0
         self.is_shutdown = False
 
     def task_done(self):
         """ Indicate that a formerly enqueued task is complete. For each dequeue() 
-        used to fetch a task, a subsequent call to this tells the queue that the processing
-        on the task is complete """
+        used to fetch a task, a subsequent call to this tells the queue that task has finished 
+        being processed. """
         with self.all_tasks_done:
             unfinished = self.unfinished_tasks - 1
             if unfinished <= 0:
                 if unfinished < 0:
+                    """ raised when task_done() is called more times than there are enqueued tasks. """
                     raise ValueError("task_done() called too many times")
+                """ threading.Condition.notify_all() wakes up all threads waiting on the condition. """
                 self.all_tasks_done.notify_all()
             self.unfinished_tasks = unfinished
 
@@ -54,7 +57,13 @@ class Queue:
         calls task_done(). When the count of unfinished tasks drops to zero, join() 
         unblocks. """
         with self.all_tasks_done:
+            """ while there are unfinished tasks, wait for all_tasks_done to be notified. """
             while self.unfinished_tasks:
+                """ threading.Condition.wait() waits until notified or until a timeout occurs. If the 
+                calling thread has not acquired the lock when this method is called, a RuntimeError is 
+                raised. This method releases the underlying lock, and then blocks until it's awakened 
+                by a notify() or notify_all() call for the same condition variable in another thread. 
+                Once awakened it re-acquires the lock and returns. """
                 self.all_tasks_done.wait()
 
     def qsize(self):
@@ -87,6 +96,8 @@ class Queue:
                             raise ShutDown
             self._enqueue(item)
             self.unfinished_tasks += 1
+            """ threading.Condition.notify(n=1) wakes up at most n of the threads waiting for the 
+            condition variable; it's a no-op if no threads are waiting. """
             self.not_empty.notify()
 
     def dequeue(self, block=True):
@@ -125,7 +136,7 @@ class Queue:
                 self.all_tasks_done.notify_all()
             self.not_empty.notify_all()
             self.not_full.notify_all()
-    
+
     def _init(self):
         """ deques (double-ended queues) are thread-safe containers supporting thread-safe 
         left- and right-end appending and popping. """
@@ -133,7 +144,7 @@ class Queue:
 
     def _qsize(self):
         return len(self.queue)
-    
+
     def _enqueue(self, item):
         """ deque.append() adds an item to the right end of the deque. """
         self.queue.append(item)
