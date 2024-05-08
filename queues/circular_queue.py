@@ -18,7 +18,7 @@ class CircularQueue:
     
     def enqueue(self, item):
         if self.full():
-            raise IndexError("Queue is full")
+            raise ValueError("Queue is full")
         """ insert an item at the tail index, before incrementing it modulo the capacity (to ensure 
         that when the pointer wraps around to the beginning of the array upon reaching the end, 
         reusing the space released by dequeuing elements), as well as the size. """
@@ -28,7 +28,7 @@ class CircularQueue:
 
     def dequeue(self):
         if self.empty():
-            raise IndexError("Queue is empty")
+            raise ValueError("Queue is empty")
         """ remove and return the item at the head index, before incrementing it modulo the 
         capacity, as well as the size. """
         item = self.queue[self.head]
