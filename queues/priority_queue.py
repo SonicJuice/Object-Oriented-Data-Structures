@@ -8,14 +8,14 @@ class PriorityQueue(ThreadSafetyWrapper):
 
     def enqueue(self, item, block=True):
         """ heapq.heappush/pop isn't thread safe. """
-        with self.protect_enqueue(block), self.mutex:
+        with self.protect_put(block), self.mutex:
             """ heaps are binary trees for which every parent node has a value <= any of its 
             children (refered to as the heap invariant); heapq.heappush() pushes an item 
             onto the heap, maintaining the heap invariant. """
             heappush(self.queue, item)
 
     def dequeue(self, block=True):
-        with self.protect_dequeue(block), self.mutex:
+        with self.protect_get(block), self.mutex:
             """ heapq.heappop() pops and returns the smallest item from the heap, maintaining 
             the heap invariant. """
             return heappop(self.queue)
