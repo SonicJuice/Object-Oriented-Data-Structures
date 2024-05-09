@@ -1,5 +1,3 @@
-
-
 class CircularQueue:
     def __init__(self, capacity):
         self.queue = [None for _ in range(capacity)]
@@ -7,15 +5,6 @@ class CircularQueue:
         self.head = self.tail = self.size = 0
         self.capacity = capacity
 
-    def qsize(self):
-        return self.size
-    
-    def empty(self):
-        return self.qsize() == 0
-    
-    def full(self):
-        return self.qsize() == self.capacity
-    
     def enqueue(self, item):
         if self.full():
             raise ValueError("Queue is full")
@@ -35,3 +24,12 @@ class CircularQueue:
         self.head = (self.head + 1) % self.capacity
         self.size -= 1
         return item
+
+    def full(self):
+        return self.qsize() == self.capacity
+
+    def empty(self):
+        return self.qsize() == 0
+
+    def qsize(self):
+        return self.size
