@@ -1,154 +1,112 @@
+from abc import ABC, abstractmethod
+from contextlib import contextmanager
 import threading
 from collections import deque
 
-
 class Empty(Exception):
-    """ Raised by Queue.dequeue(block=0). """
+    """ raised when attempting to dequeue from an empty container (i.e. count can't be 
+    acquired in ThreadSafetyWrapper.protect_dequeue()). """
     pass
 
 class Full(Exception):
-    """ Raised by Queue.enqueue(block=0). """
+    """ raised when attempting to enqueue into a full container (i.e. space can't be 
+    acquired in ThreadSafetyWrapper.protect_enqueue()). """
     pass
 
-class ShutDown(Exception):
-    """ Raised when enqueue/dequeue with shut-down queue. """
-
-
-class Queue:
-    def __init__(self, maxsize=0):
-        self.maxsize = maxsize
-        self._init()
-
-        """ the threading.Lock() class helps prevent race conditions by giving only one thread 
-        access to the critical section of code or shared resource. Other threads attempting to 
-        acquire the lock are blocked until it's released by the owning thread. """
+""" ensure that enqueue/dequeue are atomic (occur without any intermediate states visible 
+to other threads), protecting them against race conditions (multiple threads accessing 
+shared data concurrently). abc.ABC defines an abstract base class, which is meant to be 
+subclassed, but not instantiated directly. This provides a common interface for a group of 
+related classes. """
+class ThreadSafetyWrapper(ABC):
+    def __init__(self, maxsize=None):
+        """ threading.Semaphore() implements a semaphore. This synchronisation primitive 
+        (mechanism to coordinate the execution of multiple threads in a concurrent system) 
+        manages an atomic counter representing the number of release() - acquire() calls, 
+        plus an initial value. acquire() blocks if necessary until it can return without 
+        making the counter negative. """
+        self.count = threading.Semaphore(0)
+        """ self.count/space manages the number items/available space. """
+        self.space = threading.Semaphore(maxsize) if maxsize else None
+        """ threading.Lock() implements a primitive lock object; once a thread has acquired it, 
+        subsequent attempts to acquire it block, until it's released; any thread may release it. """
         self.mutex = threading.Lock()
-        """ notify not_empty whenever an item is added to the queue; a thread waiting to 
-        dequeue is notified then. the threading.Condition() class implements a condition variable 
-        objects. This allows one or more threads to wait until they are notified by another. """
-        self.not_empty = threading.Condition(self.mutex)
-        """ notify not_full whenever an item is removed from the queue; a thread waiting to 
-        enqueue is notified then. """
-        self.not_full = threading.Condition(self.mutex)
-        """ notify all_tasks_done whenever the number of unfinished tasks drops to zero; 
-        thread waiting to join() is notified to resume. """
-        self.all_tasks_done = threading.Condition(self.mutex)
 
-        self.unfinished_tasks = 0
-        self.is_shutdown = False
+    """ contextlib.contextmanager is a decorator (function that returns another function 
+    via a function transformative @wrapper) that defines a factory function for with 
+    statements without __enter__() and __exit__(). If block is True, the thread blocks 
+    until it can proceed with the operation. If it's False, the thread immediately returns 
+    if the operation can't be performed. """
+    @contextmanager
+    def protect_enqueue(self, block):
+        """ threading.Semaphore.acquire() acquires a semaphore. When blocking=True, if 
+        the counter > 0 on entry,decrement it by 1 and return True immediately. If it's 
+        0 on entry, block until awoken by a call to release(). Once awoken (and the counter > 0), 
+        decrement the counter by 1 and return True. When blocking=False, if a call without an 
+        argument would block, return False immediately. Otherwise, do the same thing as when 
+        called without arguments, and return True. """
+        if self.space and not self.space.acquire(block): 
+            raise Full
+        yield
+        """ threading.Semaphore.release(n=1) releases a semaphore, incrementing the counter 
+        by n. When it was 0 on entry and other threads are waiting for it to become > zero again, 
+        wake up n of those threads. """
+        self.count.release()
 
-    def task_done(self):
-        """ Indicate that a formerly enqueued task is complete. For each dequeue() 
-        used to fetch a task, a subsequent call to this tells the queue that task has finished 
-        being processed. """
-        with self.all_tasks_done:
-            unfinished = self.unfinished_tasks - 1
-            if unfinished <= 0:
-                if unfinished < 0:
-                    """ raised when task_done() is called more times than there are enqueued tasks. """
-                    raise ValueError("task_done() called too many times")
-                """ threading.Condition.notify_all() wakes up all threads waiting on the condition. """
-                self.all_tasks_done.notify_all()
-            self.unfinished_tasks = unfinished
+    @contextmanager
+    def protect_dequeue(self, block):
+        if not self.count.acquire(block): 
+            raise Empty
+        yield
+        if self.space: 
+            self.space.release()
 
-    def join(self):
-        """ Block until all items have been gotten and processed. unfinished_tasks 
-        increments/decrements whenever an item is added to the queue/a consumer thread 
-        calls task_done(). When the count of unfinished tasks drops to zero, join() 
-        unblocks. """
-        with self.all_tasks_done:
-            """ while there are unfinished tasks, wait for all_tasks_done to be notified. """
-            while self.unfinished_tasks:
-                """ threading.Condition.wait() waits until notified or until a timeout occurs. If the 
-                calling thread has not acquired the lock when this method is called, a RuntimeError is 
-                raised. This method releases the underlying lock, and then blocks until it's awakened 
-                by a notify() or notify_all() call for the same condition variable in another thread. 
-                Once awakened it re-acquires the lock and returns. """
-                self.all_tasks_done.wait()
-
-    def qsize(self):
-        with self.mutex:
-            return self._qsize()
-
-    def empty(self):
-        with self.mutex:
-            return not self._qsize()
-
-    def full(self):
-        with self.mutex:
-            return 0 < self.maxsize <= self._qsize()
-
+    """ abc.abstractmethod is a decorator requireing that the class's metaclass is or 
+    is derived from ABCMeta. A class with a metaclass derived from ABCMeta can't be instantiated 
+    unless all of its abstract methods and properties are overridden. The abstract methods 
+    can be called via any normal 'super' call mechanism. """
+    @abstractmethod
     def enqueue(self, item, block=True):
-        """ put an item onto the queue. If block is True, block if necessary until a free slot is 
-        available. Otherwise, put an item on the queue if a free slot is immediately available, 
-        else raise Full. Raise ShutDown if the queue has been shut down. """
-        with self.not_full:
-            if self.is_shutdown:
-                raise ShutDown
-            if self.maxsize > 0:
-                if not block:
-                    if self._qsize() >= self.maxsize:
-                        raise Full
-                else:
-                    while self._qsize() >= self.maxsize:
-                        self.not_full.wait()
-                        if self.is_shutdown:
-                            raise ShutDown
-            self._enqueue(item)
-            self.unfinished_tasks += 1
-            """ threading.Condition.notify(n=1) wakes up at most n of the threads waiting for the 
-            condition variable; it's a no-op if no threads are waiting. """
-            self.not_empty.notify()
+        pass
 
+    @abstractmethod
     def dequeue(self, block=True):
-        """ Remove and return an item from the queue. If block is True, block if necessary until an 
-        item is available. Otherwise, return an item if one is immediately available, else 
-        raise Empty. Raise ShutDown if the queue has been shut down and is empty, or if 
-        the queue has been shut down immediately. """
-        with self.not_empty:
-            if self.is_shutdown and not self._qsize():
-                raise ShutDown
-            if not block:
-                if not self._qsize():
-                    raise Empty
-            else:
-                while not self._qsize():
-                    self.not_empty.wait()
-                    if self.is_shutdown and not self._qsize():
-                        raise ShutDown
-            item = self._dequeue()
-            self.not_full.notify()
-            return item
+        pass
 
-    def shutdown(self, immediate=False):
-        """ Shut-down the queue, making enqueues and dequeues raise ShutDown. 
-        By default, dequeues will only raise once the queue is empty. immediate=True
-        makes dequeues raise immediately instead. All blocked callers of enqueue() and 
-        dequeue() will be unblocked. If immediate, a task is marked as done for each item 
-        remaining in the queue, which may unblock callers of join(). """
-        with self.mutex:
-            self.is_shutdown = True
-            if immediate:
-                while self._qsize():
-                    self._dequeue()
-                    if self.unfinished_tasks > 0:
-                        self.unfinished_tasks -= 1
-                self.all_tasks_done.notify_all()
-            self.not_empty.notify_all()
-            self.not_full.notify_all()
+    @abstractmethod
+    def empty(self):
+        pass
 
-    def _init(self):
+    @abstractmethod
+    def qsize(self):
+        pass
+
+class Queue(ThreadSafetyWrapper):
+    def __init__(self, maxsize=None):
         """ deques (double-ended queues) are thread-safe containers supporting thread-safe 
         left- and right-end appending and popping. """
         self.queue = deque()
+        """ super().__init__(maxsize) ensures that the initialisation logic defined in 
+        the superclass ThreadSafetyWrapper is executed when creating instances of Queue 
+        and PriorityQueue. """
+        super().__init__(maxsize)
 
-    def _qsize(self):
+    def enqueue(self, item, block=True):
+        """ with first calls the __enter__() method of the context manager to acquiring any necessary 
+        resources. Once the context has been established, the associated block of code is executed. 
+        After the block has been executed, (either successfully or due to an exception), 
+        it calls __exit__() to release any acquired resources and perform cleanup operations. """
+        with self.protect_enqueue(block):
+            """ deque.append() adds an item to the right end of the deque. """
+            self.queue.append(item)
+
+    def dequeue(self, block=True):
+        with self.protect_dequeue(block):
+            """ dequeue.popleft() removes and returns the left-most item. """
+            return self.queue.popleft()
+
+    def empty(self):
+        return len(self.queue) == 0
+
+    def qsize(self):
         return len(self.queue)
-
-    def _enqueue(self, item):
-        """ deque.append() adds an item to the right end of the deque. """
-        self.queue.append(item)
-
-    def _dequeue(self):
-        """ dequeue.popleft() removes and returns the left-most item. """
-        return self.queue.popleft()
