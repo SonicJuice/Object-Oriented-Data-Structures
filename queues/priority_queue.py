@@ -1,18 +1,27 @@
 from heapq import heappush, heappop
 
-
-class PriorityQueue(Queue):
-    def _init(self):
+class PriorityQueue(ThreadSafetyWrapper):
+    def __init__(self, maxsize=None):
         """ items are typically in the form (priority, data). """
         self.queue = []
+        super().__init__(maxsize)
 
-    def _enqueue(self, item):
-        """ heaps are binary trees for which every parent node has a value <= any of its 
-        children (refered to as the heap invariant); heapq.heappush() pushes an item 
-        onto the heap, maintaining the heap invariant. """
-        heappush(self.queue, item)
+    def enqueue(self, item, block=True):
+        """ heapq.heappush/pop isn't thread safe. """
+        with self.protect_enqueue(block), self.mutex:
+            """ heaps are binary trees for which every parent node has a value <= any of its 
+            children (refered to as the heap invariant); heapq.heappush() pushes an item 
+            onto the heap, maintaining the heap invariant. """
+            heappush(self.queue, item)
 
-    def _dequeue(self):
-        """ heapq.heappop() pops and returns the smallest item from the heap, maintaining 
-        the heap invariant. """
-        return heappop(self.queue)
+    def dequeue(self, block=True):
+        with self.protect_dequeue(block), self.mutex:
+            """ heapq.heappop() pops and returns the smallest item from the heap, maintaining 
+            the heap invariant. """
+            return heappop(self.queue)
+
+    def empty(self):
+        return len(self.queue) == 0
+
+    def qsize(self):
+        return len(self.queue)
