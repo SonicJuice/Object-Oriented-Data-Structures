@@ -1,24 +1,21 @@
-from abc import ABC, abstractmethod
 from contextlib import contextmanager
 import threading
 from collections import deque
 
 class Empty(Exception):
     """ raised when attempting to dequeue from an empty container (i.e. count can't be 
-    acquired in ThreadSafetyWrapper.protect_dequeue()). """
+    acquired in ThreadSafetyWrapper.protect_get()). """
     pass
 
 class Full(Exception):
     """ raised when attempting to enqueue into a full container (i.e. space can't be 
-    acquired in ThreadSafetyWrapper.protect_enqueue()). """
+    acquired in ThreadSafetyWrapper.protect_put()). """
     pass
 
 """ ensure that enqueue/dequeue are atomic (occur without any intermediate states visible 
 to other threads), protecting them against race conditions (multiple threads accessing 
-shared data concurrently). abc.ABC defines an abstract base class, which is meant to be 
-subclassed, but not instantiated directly. This provides a common interface for a group of 
-related classes. """
-class ThreadSafetyWrapper(ABC):
+shared data concurrently). """
+class ThreadSafetyWrapper:
     def __init__(self, maxsize=None):
         """ threading.Semaphore() implements a semaphore. This synchronisation primitive 
         (mechanism to coordinate the execution of multiple threads in a concurrent system) 
@@ -38,7 +35,7 @@ class ThreadSafetyWrapper(ABC):
     until it can proceed with the operation. If it's False, the thread immediately returns 
     if the operation can't be performed. """
     @contextmanager
-    def protect_enqueue(self, block):
+    def protect_put(self, block):
         """ threading.Semaphore.acquire() acquires a semaphore. When blocking=True, if 
         the counter > 0 on entry,decrement it by 1 and return True immediately. If it's 
         0 on entry, block until awoken by a call to release(). Once awoken (and the counter > 0), 
@@ -54,32 +51,12 @@ class ThreadSafetyWrapper(ABC):
         self.count.release()
 
     @contextmanager
-    def protect_dequeue(self, block):
+    def protect_get(self, block):
         if not self.count.acquire(block): 
             raise Empty
         yield
         if self.space: 
             self.space.release()
-
-    """ abc.abstractmethod is a decorator requireing that the class's metaclass is or 
-    is derived from ABCMeta. A class with a metaclass derived from ABCMeta can't be instantiated 
-    unless all of its abstract methods and properties are overridden. The abstract methods 
-    can be called via any normal 'super' call mechanism. """
-    @abstractmethod
-    def enqueue(self, item, block=True):
-        pass
-
-    @abstractmethod
-    def dequeue(self, block=True):
-        pass
-
-    @abstractmethod
-    def empty(self):
-        pass
-
-    @abstractmethod
-    def qsize(self):
-        pass
 
 class Queue(ThreadSafetyWrapper):
     def __init__(self, maxsize=None):
@@ -96,12 +73,12 @@ class Queue(ThreadSafetyWrapper):
         resources. Once the context has been established, the associated block of code is executed. 
         After the block has been executed, (either successfully or due to an exception), 
         it calls __exit__() to release any acquired resources and perform cleanup operations. """
-        with self.protect_enqueue(block):
+        with self.protect_put(block):
             """ deque.append() adds an item to the right end of the deque. """
             self.queue.append(item)
 
     def dequeue(self, block=True):
-        with self.protect_dequeue(block):
+        with self.protect_get(block):
             """ dequeue.popleft() removes and returns the left-most item. """
             return self.queue.popleft()
 
