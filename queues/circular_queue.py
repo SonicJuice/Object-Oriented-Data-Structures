@@ -14,8 +14,8 @@ class CircularQueue:
         that when the pointer wraps around to the beginning of the array upon reaching the end, 
         reusing the space released by dequeuing elements), as well as the size. """
         self.rear = (self.rear + 1) % self.maxsize
-        self.size += 1
         self.queue[self.rear] = item
+        self.size += 1
 
     def dequeue(self):
         if self.empty():
