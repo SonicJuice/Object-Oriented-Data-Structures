@@ -1,4 +1,4 @@
-class CircularQueue:
+class CircularQueue(ThreadSafetyWrapper):
     def __init__(self, maxsize):
         self.queue = [None for _ in range(maxsize)]
         """ current front and rear pointers, and the number of enqueued items. """
@@ -6,31 +6,28 @@ class CircularQueue:
         self.rear = -1
         self.size = 0
         self.maxsize = maxsize
+        super().__init__(maxsize)
 
-    def enqueue(self, item):
-        if self.full():
-            raise ValueError("Queue is full")
-        """ insert an item at the rear index, before incrementing it modulo the maxsize (to ensure 
-        that when the pointer wraps around to the beginning of the array upon reaching the end, 
-        reusing the space released by dequeuing elements), as well as the size. """
-        self.rear = (self.rear + 1) % self.maxsize
-        self.queue[self.rear] = item
-        self.size += 1
+    def enqueue(self, item, block=True):
+        with self.protect_put(block), self.mutex:
+            """ insert an item at the rear index, before incrementing it modulo the 
+            maxsize (to ensure that when the pointer wraps around to the beginning of 
+            the array upon reaching the end, 
+            reusing the space released by dequeuing elements), as well as the size. """
+            self.rear = (self.rear + 1) % self.maxsize
+            self.queue[self.rear] = item
+            self.size += 1
 
-    def dequeue(self):
-        if self.empty():
-            raise ValueError("Queue is empty")
-        """ remove and return the item at the front index, before incrementing it modulo the 
-        maxsize, as well as the size. """
-        item = self.queue[self.front]
-        self.queue[self.front] = None
-        self.front = (self.front + 1) % self.maxsize
-        self.size -= 1
-        return item
-
-    def full(self):
-        return self.size == self.maxsize
-
+    def dequeue(self, block=True):
+        with self.protect_get(block), self.mutex:
+            """ remove and return the item at the front index, before incrementing it 
+            modulo the maxsize, as well as the size. """
+            item = self.queue[self.front]
+            self.queue[self.front] = None
+            self.front = (self.front + 1) % self.maxsize
+            self.size -= 1
+            return item
+    
     def empty(self):
         return self.size == 0
 
