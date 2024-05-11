@@ -15,5 +15,5 @@ class Stack(ThreadSafetyWrapper):
     def empty(self):
         return len(self.stack) == 0
 
-    def qsize(self):
+    def size(self):
         return len(self.stack)
