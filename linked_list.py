@@ -26,7 +26,8 @@ class LinkedList:
     def add_before(self, ref_node, data):
         new_node = ListNode(data)
         current = self.head
-        while current:
+        found = False
+        while current and not found:
             if current.data == ref_node:
                 if current == self.head:
                     new_node.next = current
@@ -37,13 +38,14 @@ class LinkedList:
                     new_node.next = current
                     current.prev.next = new_node
                     current.prev = new_node
-                break
+                found = True
             current = current.next
 
     def add_after(self, ref_node, data):
         new_node = ListNode(data)
         current = self.head
-        while current:
+        found = False
+        while current and not found:
             if current.data == ref_node:
                 if current == self.tail:
                     new_node.prev = current
@@ -54,7 +56,7 @@ class LinkedList:
                     new_node.prev = current
                     current.next.prev = new_node
                     current.next = new_node
-                break
+                found = True
             current = current.next
 
     def remove_head(self):
@@ -78,7 +80,19 @@ class LinkedList:
             return data
 
     def remove(self, data):
-        pass
+        current = self.head
+        found = False
+        while current and not found:
+            if current.data == data:
+                if current == self.head:
+                    self.remove_head()
+                elif current == self.tail:
+                    self.remove_tail()
+                else:
+                    current.prev.next = current.next
+                    current.next.prev = current.prev
+                found = True
+            current = current.next
 
     def traverse(self):
         current = self.head
