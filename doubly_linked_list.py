@@ -57,32 +57,31 @@ class DoublyLinkedList:
             self.size += 1
 
     def pop(self):
-        if not self.tail:
-            raise IndexError("pop from empty list")
-        data = self.tail.data
-        if self.head == self.tail:
-            self.head = self.tail = None
-        else:
-            self.tail = self.tail.prev
-            self.tail.next = None
-        self.size -= 1
-        return data
-
+        if self.tail:
+            data = self.tail.data
+            if self.head == self.tail:
+                self.head = self.tail = None
+            else:
+                self.tail = self.tail.prev
+                self.tail.next = None
+            self.size -= 1
+            return data
+    
     def popleft(self):
-        if not self.head:
-            raise IndexError("pop from empty list")
-        data = self.head.data
-        if self.head == self.tail:
-            self.head = self.tail = None
-        else:
-            self.head = self.head.next
-            self.head.prev = None
-        self.size -= 1
-        return data
+        if self.head:
+            data = self.head.data
+            if self.head == self.tail:
+                self.head = self.tail = None
+            else:
+                self.head = self.head.next
+                self.head.prev = None
+            self.size -= 1
+            return data
 
     def remove(self, data):
         current = self.head
-        while current:
+        found = False
+        while current and not found:
             if current.data == data:
                 if current.prev:
                     current.prev.next = current.next
@@ -93,5 +92,5 @@ class DoublyLinkedList:
                 else:
                     self.tail = current.prev
                 self.size -= 1
-                return
+                found = True
             current = current.next
