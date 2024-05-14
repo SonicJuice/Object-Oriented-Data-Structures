@@ -24,9 +24,8 @@ class DoublyLinkedList:
         if not self.head:
             self.head = self.tail = new_node
         else:
-            self.tail.next = new_node
             new_node.prev = self.tail
-            self.tail = new_node
+            self.tail.next = self.tail = new_node
         self.size += 1
 
     def appendleft(self, data):
@@ -62,8 +61,7 @@ class DoublyLinkedList:
             if self.head == self.tail:
                 self.head = self.tail = None
             else:
-                self.tail = self.tail.prev
-                self.tail.next = None
+                self.tail, self.tail.next = self.tail.prev, None
             self.size -= 1
             return data
     
@@ -73,8 +71,7 @@ class DoublyLinkedList:
             if self.head == self.tail:
                 self.head = self.tail = None
             else:
-                self.head = self.head.next
-                self.head.prev = None
+                self.head, self.head.prev = self.head.next, None
             self.size -= 1
             return data
 
