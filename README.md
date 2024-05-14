@@ -1,7 +1,7 @@
 # Python ADTs
 Object-oriented implementations of various abstract data types!
 
-- Linked List (utilising double linking for bi-directional node traversal)
+- Doubly Linked List
 
 - Stack
 
