@@ -6,14 +6,10 @@ class ListNode:
 class DoublyLinkedList:
     def __init__(self):
         self.head = self.tail = None
+        self.size = 0
 
     def __len__(self):
-        count = 0
-        current = self.head
-        while current:
-            count += 1
-            current = current.next
-        return count
+        return self.size
 
     def __getitem__(self, index):
         if index < 0:
@@ -31,6 +27,7 @@ class DoublyLinkedList:
             self.tail.next = new_node
             new_node.prev = self.tail
             self.tail = new_node
+        self.size += 1
 
     def appendleft(self, data):
         new_node = ListNode(data)
@@ -39,6 +36,7 @@ class DoublyLinkedList:
         else:
             new_node.next = self.head
             self.head.prev = self.head = new_node
+        self.size += 1
 
     def insert(self, index, data):
         if index < 0:
@@ -56,23 +54,30 @@ class DoublyLinkedList:
             if current.prev:
                 current.prev.next = new_node
             current.prev = new_node
+            self.size += 1
 
     def pop(self):
+        if not self.tail:
+            raise IndexError("pop from empty list")
         data = self.tail.data
         if self.head == self.tail:
             self.head = self.tail = None
         else:
             self.tail = self.tail.prev
             self.tail.next = None
+        self.size -= 1
         return data
 
     def popleft(self):
+        if not self.head:
+            raise IndexError("pop from empty list")
         data = self.head.data
         if self.head == self.tail:
             self.head = self.tail = None
         else:
             self.head = self.head.next
             self.head.prev = None
+        self.size -= 1
         return data
 
     def remove(self, data):
@@ -87,5 +92,6 @@ class DoublyLinkedList:
                     current.next.prev = current.prev
                 else:
                     self.tail = current.prev
+                self.size -= 1
                 return
             current = current.next
