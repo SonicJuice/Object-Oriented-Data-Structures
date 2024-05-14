@@ -3,7 +3,7 @@ class ListNode:
         self.data = data
         self.prev = self.next = None
 
-class LinkedList:
+class DoublyLinkedList:
     def __init__(self):
         self.head = self.tail = None
 
@@ -24,6 +24,9 @@ class LinkedList:
             self.tail.next = self.tail = new_node
 
     def add_before(self, ref_node, data):
+        if not self.head:
+            raise ValueError("List is empty")
+
         new_node = ListNode(data)
         current = self.head
         found = False
@@ -40,8 +43,13 @@ class LinkedList:
                     current.prev = new_node
                 found = True
             current = current.next
+        if not found:
+            raise ValueError("Reference node not found")
 
     def add_after(self, ref_node, data):
+        if not self.head:
+            raise ValueError("List is empty")
+
         new_node = ListNode(data)
         current = self.head
         found = False
@@ -58,28 +66,37 @@ class LinkedList:
                     current.next = new_node
                 found = True
             current = current.next
+        if not found:
+            raise ValueError("Reference node not found")
 
     def remove_head(self):
-        if self.head:
-            data = self.head.data
-            if self.head == self.tail:
-                self.head = self.tail = None
-            else:
-                self.head = self.head.next
-                self.head.prev = None
-            return data
+        if not self.head:
+            raise ValueError("List is empty")
+
+        data = self.head.data
+        if self.head == self.tail:
+            self.head = self.tail = None
+        else:
+            self.head = self.head.next
+            self.head.prev = None
+        return data
 
     def remove_tail(self):
-        if self.head:
-            data = self.tail.data
-            if self.head == self.tail:
-                self.head = self.tail = None
-            else:
-                self.tail = self.tail.prev
-                self.tail.next = None
-            return data
+        if not self.head:
+            raise ValueError("List is empty")
+
+        data = self.tail.data
+        if self.head == self.tail:
+            self.head = self.tail = None
+        else:
+            self.tail = self.tail.prev
+            self.tail.next = None
+        return data
 
     def remove(self, data):
+        if not self.head:
+            raise ValueError("List is empty")
+
         current = self.head
         found = False
         while current and not found:
