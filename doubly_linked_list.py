@@ -199,7 +199,7 @@ class DoublyLinkedList:
 
     def clear(self):
         self.head = self.tail = None
-        self._size = 0
+        self.size = 0
 
     def reverse(self):
         if self.size > 1:
