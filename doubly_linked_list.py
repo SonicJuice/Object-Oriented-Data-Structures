@@ -42,35 +42,33 @@ class DoublyLinkedList:
             node_self, node_other = node_self.next, node_other.next
         return True
 
-    def __validate_and_repair_index(self, index):
-        if not isinstance(index, int):
-            raise TypeError("List index must be an integer")
-        index = self.size + index if index < 0 else index
-        return index
-
     def __getitem__(self, index):
         index = self.__validate_and_repair_index(index)
         if 0 <= index < self.size:
-            i = 0
-            node = self.head
-            while node:
-                if i == index:
-                    return node.value
-                node = node.next
-                i += 1
+            if index <= self.size // 2:
+                current = self.head
+                for _ in range(index):
+                    current = current.next
+            else:
+                current = self.tail
+                for _ in range(self.size - 1, index, -1):
+                    current = current.prev
+            return current.value
         raise IndexError("List index out of range")
 
     def __setitem__(self, index, item):
         index = self.__validate_and_repair_index(index)
         if 0 <= index < self.size:
-            i = 0
-            node = self.head
-            while node:
-                if i == index:
-                    node.value = item
-                    return
-                node = node.next
-                i += 1
+            if index <= self.size // 2:
+                current = self.head
+                for _ in range(index):
+                    current = current.next
+            else:
+                current = self.tail
+                for _ in range(self.size - 1, index, -1):
+                    current = current.prev
+            current.value = item
+            return
         raise IndexError("List assignment index out of range")
 
     def __delitem__(self, index):
@@ -98,6 +96,12 @@ class DoublyLinkedList:
         else:
             raise IndexError("List index out of range")
 
+    def __validate_and_repair_index(self, index):
+        if not isinstance(index, int):
+            raise TypeError("List index must be an integer")
+        index = self.size + index if index < 0 else index
+        return index
+
     def appendleft(self, item):
         new_node = ListNode(item)
         if not self.head:
@@ -118,38 +122,25 @@ class DoublyLinkedList:
 
     def insert(self, index, item):
         index = self.__validate_and_repair_index(index)
-        if index > self.size - 1:
+        if index == self.size:
             self.append(item)
-        elif index <= 0:
+        elif index == 0:
             self.appendleft(item)
+        elif 0 < index < self.size:
+            if index <= self.size // 2:
+                current = self.head
+                for _ in range(index):
+                    current = current.next
+            else:
+                current = self.tail
+                for _ in range(self.size - 1, index, -1):
+                    current = current.prev
+            new_node = ListNode(item)
+            new_node.prev, new_node.next = current.prev, current
+            current.prev.next = current.prev = new_node
+            self.size += 1
         else:
-            i = 0
-            node = self.head
-            while node:
-                if i == index - 1:
-                    new_node = ListNode(item)
-                    new_node.next, new_node.prev = node.next, node
-                    node.next = new_node
-                    if new_node.next:
-                        new_node.next.prev = new_node
-                    self.size += 1
-                    return
-                node = node.next
-                i += 1
-
-    def index(self, item):
-        for index, el in enumerate(self):
-            if el == item:
-                return index
-        return -1
-
-    def extend(self, seq):
-        for i in seq:
-            self.append(i)
-
-    def extendleft(self, seq):
-        for i in seq:
-            self.appendleft(i)
+            raise IndexError("List index out of range")
 
     def pop(self):
         if self.size == 0:
@@ -191,3 +182,29 @@ class DoublyLinkedList:
                 except AttributeError:
                     raise ValueError("Value not in list") from None
             self.size -= 1
+
+    def index(self, item):
+        for index, el in enumerate(self):
+            if el == item:
+                return index
+        return -1
+
+    def extend(self, seq):
+        for i in seq:
+            self.append(i)
+
+    def extendleft(self, seq):
+        for i in seq:
+            self.appendleft(i)
+
+    def clear(self):
+        self.head = self.tail = None
+        self._size = 0
+
+    def reverse(self):
+        if self.size > 1:
+            current = self.head
+            while current:
+                current.next, current.prev = current.prev, current.next
+                current = current.prev
+            self.head, self.tail = self.tail, self.head
