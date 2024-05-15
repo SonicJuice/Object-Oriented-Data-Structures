@@ -20,7 +20,7 @@ class DoublyLinkedList:
 
     def __str__(self):
         return f"dll({list(self)})"
-    
+
     def __repr__(self):
         return self.__str__()
 
@@ -102,15 +102,6 @@ class DoublyLinkedList:
         index = self.size + index if index < 0 else index
         return index
 
-    def appendleft(self, item):
-        new_node = ListNode(item)
-        if not self.head:
-            self.head = self.tail = new_node
-        else:
-            new_node.next = self.head
-            self.head.prev = self.head = new_node
-        self.size += 1
-
     def append(self, item):
         new_node = ListNode(item)
         if not self.tail:
@@ -118,6 +109,15 @@ class DoublyLinkedList:
         else:
             new_node.prev = self.tail
             self.tail.next = self.tail = new_node
+        self.size += 1
+
+    def appendleft(self, item):
+        new_node = ListNode(item)
+        if not self.head:
+            self.head = self.tail = new_node
+        else:
+            new_node.next = self.head
+            self.head.prev = self.head = new_node
         self.size += 1
 
     def insert(self, index, item):
@@ -141,6 +141,41 @@ class DoublyLinkedList:
             self.size += 1
         else:
             raise IndexError("List index out of range")
+
+    def extend(self, seq):
+        for i in seq:
+            self.append(i)
+
+    def extendleft(self, seq):
+        for i in seq:
+            self.appendleft(i)
+
+    def index(self, item):
+        node = self.head
+        index = 0
+        while node:
+            if node.value == item:
+                return index
+            node = node.next
+            index += 1
+        return -1
+
+    def count(self, item):
+        count = 0
+        node = self.head
+        while node:
+            if node.value == item:
+                count += 1
+            node = node.next
+        return count
+    
+    def reverse(self):
+        if self.size > 1:
+            current = self.head
+            while current:
+                current.next, current.prev = current.prev, current.next
+                current = current.prev
+            self.head, self.tail = self.tail, self.head
 
     def pop(self):
         if self.size == 0:
@@ -183,41 +218,6 @@ class DoublyLinkedList:
                     raise ValueError("Value not in list") from None
             self.size -= 1
 
-    def index(self, item):
-        node = self.head
-        index = 0
-        while node:
-            if node.value == item:
-                return index
-            node = node.next
-            index += 1
-        return -1
-
-    def count(self, item):
-        count = 0
-        node = self.head
-        while node:
-            if node.value == item:
-                count += 1
-            node = node.next
-        return count
-
-    def extend(self, seq):
-        for i in seq:
-            self.append(i)
-
-    def extendleft(self, seq):
-        for i in seq:
-            self.appendleft(i)
-
     def clear(self):
         self.head = self.tail = None
         self.size = 0
-
-    def reverse(self):
-        if self.size > 1:
-            current = self.head
-            while current:
-                current.next, current.prev = current.prev, current.next
-                current = current.prev
-            self.head, self.tail = self.tail, self.head
