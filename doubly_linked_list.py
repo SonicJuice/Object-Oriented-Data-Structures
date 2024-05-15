@@ -184,10 +184,23 @@ class DoublyLinkedList:
             self.size -= 1
 
     def index(self, item):
-        for index, el in enumerate(self):
-            if el == item:
+        node = self.head
+        index = 0
+        while node:
+            if node.value == item:
                 return index
+            node = node.next
+            index += 1
         return -1
+
+    def count(self, item):
+        count = 0
+        node = self.head
+        while node:
+            if node.value == item:
+                count += 1
+            node = node.next
+        return count
 
     def extend(self, seq):
         for i in seq:
