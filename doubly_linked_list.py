@@ -1,9 +1,11 @@
 class ListNode:
+    __slots__ = ("value", "next", "prev")
     def __init__(self, value):
         self.value = value
         self.next = self.prev = None
 
 class DoublyLinkedList:
+    __slots__ = ("head", "tail", "size")
     def __init__(self, seq=()):
         self.head = self.tail = None
         self.size = 0
@@ -19,7 +21,7 @@ class DoublyLinkedList:
         return self.size
 
     def __str__(self):
-        return f"dll({list(self)})"
+        return f"dll({list(self)}"
 
     def __repr__(self):
         return self.__str__()
@@ -68,19 +70,20 @@ class DoublyLinkedList:
                 for _ in range(self.size - 1, index, -1):
                     current = current.prev
             current.value = item
-            return
-        raise IndexError("List assignment index out of range")
+        else:
+            raise IndexError("List assignment index out of range")
 
     def __delitem__(self, index):
         index = self.__validate_and_repair_index(index)
         if 0 < index < self.size - 1:
             i = 0
             node = self.head
-            while node:
+            deleted = False
+            while node and not deleted:
                 if i == index:
                     node.prev.next, node.next.prev = node.next, node.prev
                     self.size -= 1
-                    return
+                    deleted = True
                 node = node.next
                 i += 1
         elif index == 0 and self.head is not None:
@@ -168,7 +171,7 @@ class DoublyLinkedList:
                 count += 1
             node = node.next
         return count
-    
+
     def reverse(self):
         if self.size > 1:
             current = self.head
@@ -206,13 +209,14 @@ class DoublyLinkedList:
             else:
                 node = self.head
                 try:
-                    while node:
+                    removed = False
+                    while node and not removed:
                         if node.value == item:
                             node.prev.next = node.next
                             if node.next:
                                 node.next.prev = node.prev
                             self.size -= 1
-                            return
+                            removed = True
                         node = node.next
                 except AttributeError:
                     raise ValueError("Value not in list") from None
