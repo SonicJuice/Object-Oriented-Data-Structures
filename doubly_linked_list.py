@@ -9,11 +9,17 @@ class DoublyLinkedList:
         self.size = 0
         self.extend(values)
 
+    def __iter__(self):
+        node = self.head
+        while node:
+            yield node.value
+            node = node.next
+
     def __len__(self):
         return self.size
 
     def __str__(self):
-        return "None <= " + " <=> ".join(map(str, self)) + " => None"
+        return f"dll({list(self)})"
 
     def __repr__(self):
         return self.__str__()
@@ -95,7 +101,7 @@ class DoublyLinkedList:
         else:
             raise IndexError("List index out of range")
 
-    def insertStart(self, item):
+    def appendleft(self, item):
         new_node = ListNode(item)
         if not self.head:
             self.head = new_node
@@ -106,7 +112,7 @@ class DoublyLinkedList:
             self.head = new_node
         self.size += 1
 
-    def insertEnd(self, item):
+    def append(self, item):
         new_node = ListNode(item)
         if not self.tail:
             self.tail = new_node
@@ -120,9 +126,9 @@ class DoublyLinkedList:
     def insert(self, index, item):
         index = self.__validate_and_repair_index(index)
         if index > self.size - 1:
-            self.insertEnd(item)
+            self.append(item)
         elif index <= 0:
-            self.insertStart(item)
+            self.appendleft(item)
         else:
             i = 0
             node = self.head
@@ -139,9 +145,29 @@ class DoublyLinkedList:
                 node = node.next
                 i += 1
 
+    def index(self, item):
+        for index, el in enumerate(self):
+            if el == item:
+                return index
+        return -1
+
     def extend(self, seq=()):
         for i in seq:
-            self.insertEnd(i)
+            self.append(i)
+
+    def pop(self):
+        if self.size == 0:
+            raise IndexError("List is empty")
+        item = self.tail.value
+        del self[self.size - 1]
+        return item
+
+    def popleft(self):
+        if self.size == 0:
+            raise IndexError("List is empty")
+        item = self.head.value
+        del self[0]
+        return item
 
     def remove(self, item):
         if not self.head:
@@ -167,45 +193,5 @@ class DoublyLinkedList:
                             return
                         node = node.next
                 except AttributeError:
-                    raise ValueError("Value not present in list") from None
+                    raise ValueError("Value not in list") from None
             self.size -= 1
-
-    def pop(self, index=-1):
-        if self.size == 0:
-            raise IndexError("List is empty")
-        t = type(index)
-        if t is not int:
-            raise TypeError("{} can't be interpreted as an integer".format(t))
-        index = self.__validate_and_repair_index(index)
-        if index == self.size - 1:
-            item = self.tail.value
-            del self[self.size - 1]
-            return item
-        if index == 0:
-            item = self.head.value
-            del self[0]
-            return item
-        i = 0
-        node = self.head
-        while node:
-            if i == index:
-                item = node.value
-                del self[index]
-                return item
-            node = node.next
-            i += 1
-
-    def index(self, item):
-        for index, el in enumerate(self):
-            if el == item:
-                return index
-        return -1
-
-    def count(self, item):
-        count = 0
-        node = self.head
-        while node:
-            if node.value == item:
-                count += 1
-            node = node.next
-        return count
