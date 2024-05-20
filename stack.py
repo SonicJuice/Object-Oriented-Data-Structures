@@ -12,6 +12,9 @@ class Stack(ThreadSafetyWrapper):
             """ dequeue.pop() removes and returns the left-most item. """
             return self.stack.pop()
 
+    def peek(self):
+        return self.stack[-1]
+
     def empty(self):
         return len(self.stack) == 0
 
