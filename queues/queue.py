@@ -64,8 +64,7 @@ class Queue(ThreadSafetyWrapper):
         left- and right-end appending and popping. """
         self.queue = deque()
         """ super().__init__(maxsize) ensures that the initialisation logic defined in 
-        the superclass ThreadSafetyWrapper is executed when creating instances of Queue 
-        and PriorityQueue. """
+        the superclass ThreadSafetyWrapper is executed when creating instances of Queue. """
         super().__init__(maxsize)
 
     def enqueue(self, item, block=True):
