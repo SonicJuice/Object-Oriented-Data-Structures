@@ -1,5 +1,5 @@
-# Python ADTs
-Object-oriented implementations of various abstract data types!
+# Python Data Structures
+Object-oriented implementations of various useful data structures!
 
 - Stack
 
