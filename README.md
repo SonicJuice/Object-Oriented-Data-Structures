@@ -9,9 +9,7 @@ Object-oriented implementations of various abstract data types!
 
 ## Queues
 - Queue
-  
-- Circular Queue
-  
+    
 - Priority Queue
   
 ## Graphs
