@@ -1,3 +1,5 @@
+from collections import deque
+
 """ a queue derivation in which elements must join and leave via the top. """
 class Stack(ThreadSafetyWrapper):
     def __init__(self, maxsize=None):
