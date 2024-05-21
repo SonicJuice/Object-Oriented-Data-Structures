@@ -1,5 +1,8 @@
 from heapq import heappush, heappop
 
+""" a queue derivation in which elements have an associated priority to compare with others. 
+A sorted order is maintained to let new elements join where necessary while shuffling the existing 
+ones accordingly. When two elements are of equal priority, they’ll follow their insertion order. """
 class PriorityQueue(ThreadSafetyWrapper):
     def __init__(self, maxsize=None):
         """ items are typically in the form (priority, data). """
