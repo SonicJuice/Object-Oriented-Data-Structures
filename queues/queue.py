@@ -58,9 +58,9 @@ class ThreadSafetyWrapper:
         if self.space: 
             self.space.release()
 
-""" data structure that processes elements on a first-come, first-served basis. A new element 
-is only allowed to join the queue via the tail, while the oldest must leave from the head. 
-This causes all of its followers to shift one position towards the head.  """
+""" processes elements on a first-come, first-served basis. A new element is only allowed 
+to join the queue via the tail, while the oldest must leave from the head. This causes 
+all of its followers to shift one position towards the head. """
 class Queue(ThreadSafetyWrapper):
     def __init__(self, maxsize=None):
         """ deques (double-ended queues) are thread-safe containers supporting thread-safe 
