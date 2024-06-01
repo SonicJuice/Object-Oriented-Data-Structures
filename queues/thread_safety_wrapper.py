@@ -29,9 +29,9 @@ class ThreadSafetyWrapper:
         self.mutex = threading.Lock()
 
     """ contextlib.contextmanager is a decorator (function that returns another function 
-    via a function transformative @wrapper) that defines a factory function for with 
-    statements without __enter__() and __exit__(). If block is True, the thread blocks 
-    until it can proceed with the operation. If it's False, the thread immediately returns 
+    via a transformative @wrapper) that defines a factory function for with statements 
+    without __enter__() and __exit__(). If block is True, the thread blocks until it 
+    can proceed with the operation. If it's False, the thread immediately returns 
     if the operation can't be performed. """
     @contextmanager
     def protect_put(self, block):
