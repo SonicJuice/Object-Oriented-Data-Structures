@@ -43,7 +43,32 @@ class RBTree:
         self._NIL: Leaf = Leaf()
         self.root: Union[Node, Leaf] = self._NIL
         self._mutex = Lock()
-        
+
+    def empty(self) -> bool:
+        return self.root is None or self.root == self._NIL
+
+    """ typing.Optional denotes that a variable can be of a specified type or None. """
+    def search(self, key: Any) -> Optional[Node]:
+        with self._mutex:
+            return self._search(key=key)
+
+    def _search(self, key: Any) -> Optional[Node]:
+        """ look for a node with the given key. """
+        current = self.root
+
+        """ iterate from the root and compare the key with each node's from along the 
+        path. """
+        while isinstance(current, Node):
+            """ if a key matches, the node has been found. """
+            if key < current.key:
+                current = current.left
+            elif key > current.key:
+                current = current.right
+            else:
+                return current
+        """ if the Leaf is reached, the node doesn't exist. """
+        raise NodeNotFoundError
+
     def insert(self, key: Any, data: Any) -> None:
         with self._mutex:
             new_node = Node(key=key, data=data, color=Color.RED)
@@ -119,14 +144,6 @@ class RBTree:
                     if original_color == Color.BLACK and isinstance(replacing_replacement, Node):
                         self._delete_fixup(fixing_node=replacing_replacement)
 
-    """ typing.Optional denotes that a variable can be of a specified type or None. """
-    def search(self, key: Any) -> Optional[Node]:
-        with self._mutex:
-            return self._search(key=key)
-        
-    def empty(self) -> bool:
-        return self.root is None or self.root == self._NIL
-
     """ @staticmethods don't require access to the instance or class they belong to. This 
     means they can be called on a class or instance without any reference to them. """
     @staticmethod
@@ -163,17 +180,6 @@ class RBTree:
         return current_node
 
     @staticmethod
-    def predecessor(node: Node) -> Union[Node, Leaf]:
-        if isinstance(node.left, Node):
-            return RBTree.rightmost(node=node.left)
-
-        parent = node.parent
-        while isinstance(parent, Node) and node == parent.left:
-            node = parent
-            parent = parent.parent
-        return node.parent
-
-    @staticmethod
     def successor(node: Node) -> Union[Node, Leaf]:
         """ if the right child of the given node isn't empty, the leftmost node of the 
         left subtree is the predecessor. """
@@ -188,6 +194,17 @@ class RBTree:
             parent = parent.parent
         return parent
 
+    @staticmethod
+    def predecessor(node: Node) -> Union[Node, Leaf]:
+        if isinstance(node.left, Node):
+            return RBTree.rightmost(node=node.left)
+
+        parent = node.parent
+        while isinstance(parent, Node) and node == parent.left:
+            node = parent
+            parent = parent.parent
+        return node.parent
+
     """ typing.iterator[tuple[Any, Any]] denotes that a variable implements __iter__() 
     and __next__() to yield tuples containing two elements of any type. """
     def inorder_traverse(self) -> Iterator[tuple[Any, Any]]:
@@ -198,6 +215,52 @@ class RBTree:
 
     def postorder_traverse(self) -> Iterator[tuple[Any, Any]]:
         return self._postorder_traverse(node=self.root)
+
+    def _left_rotate(self, node_x: Node) -> None:
+        node_y = node_x.right
+        if isinstance(node_y, Leaf):
+            raise RuntimeError("Invalid left rotate")
+
+        """ turn node_y's subtree into node_x's. """
+        node_x.right = node_y.left
+        if isinstance(node_y.left, Node):
+            node_y.left.parent = node_x
+        node_y.parent = node_x.parent
+
+        """ if node x's parent is a Leaf. """
+        if isinstance(node_x.parent, Leaf):
+            """ make node_y into the new root. """
+            self.root = node_y
+        elif node_x == node_x.parent.left:
+            """ otherwise, update node_x's parent. """
+            node_x.parent.left = node_y
+        else:
+            node_x.parent.right = node_y
+
+        """ node_x's right child can't be a Leaf (NIL), as this would be redundant to 
+        rotate. """
+        node_y.left = node_x
+        node_x.parent = node_y
+
+    def _right_rotate(self, node_x: Node) -> None:
+        node_y = node_x.left
+        if isinstance(node_y, Leaf):
+            raise RuntimeError("Invalid right rotate")
+
+        node_x.left = node_y.right
+        if isinstance(node_y.right, Node):
+            node_y.right.parent = node_x
+        node_y.parent = node_x.parent
+
+        if isinstance(node_x.parent, Leaf):
+            self.root = node_y
+        elif node_x == node_x.parent.right:
+            node_x.parent.right = node_y
+        else:
+            node_x.parent.left = node_y
+
+        node_y.right = node_x
+        node_x.parent = node_y
 
     def _insert_fixup(self, fixing_node: Node) -> None:
         """ RBTP 4 holds after insertion, as the new red node replaces a Leaf (NIL), 
@@ -376,52 +439,6 @@ class RBTree:
 
             if fixing_node.color is not Color.BLACK:
                 fixing_node.color = Color.BLACK
-
-    def _left_rotate(self, node_x: Node) -> None:
-        node_y = node_x.right
-        if isinstance(node_y, Leaf):
-            raise RuntimeError("Invalid left rotate")
-
-        """ turn node_y's subtree into node_x's. """
-        node_x.right = node_y.left
-        if isinstance(node_y.left, Node):
-            node_y.left.parent = node_x
-        node_y.parent = node_x.parent
-
-        """ if node x's parent is a Leaf. """
-        if isinstance(node_x.parent, Leaf):
-            """ make node_y into the new root. """
-            self.root = node_y
-        elif node_x == node_x.parent.left:
-            """ otherwise, update node_x's parent. """
-            node_x.parent.left = node_y
-        else:
-            node_x.parent.right = node_y
-
-        """ node_x's right child can't be a Leaf (NIL), as this would be redundant to 
-        rotate. """
-        node_y.left = node_x
-        node_x.parent = node_y
-
-    def _right_rotate(self, node_x: Node) -> None:
-        node_y = node_x.left
-        if isinstance(node_y, Leaf):
-            raise RuntimeError("Invalid right rotate")
-
-        node_x.left = node_y.right
-        if isinstance(node_y.right, Node):
-            node_y.right.parent = node_x
-        node_y.parent = node_x.parent
-
-        if isinstance(node_x.parent, Leaf):
-            self.root = node_y
-        elif node_x == node_x.parent.right:
-            node_x.parent.right = node_y
-        else:
-            node_x.parent.left = node_y
-
-        node_y.right = node_x
-        node_x.parent = node_y
 
     def _transplant(self, deleting_node: Node, replacing_node: Union[Node, Leaf]) -> None:
         """ replace the subtree rooted at deleting_node with the one at replacing_node.
