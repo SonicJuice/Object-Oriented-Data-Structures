@@ -219,7 +219,7 @@ class RBTree:
     def _left_rotate(self, node_x: Node) -> None:
         node_y = node_x.right
         if isinstance(node_y, Leaf):
-            raise InvalidRotationError
+            raise RuntimeError("Invalid left rotate")
 
         """ turn node_y's subtree into node_x's. """
         node_x.right = node_y.left
@@ -245,7 +245,7 @@ class RBTree:
     def _right_rotate(self, node_x: Node) -> None:
         node_y = node_x.left
         if isinstance(node_y, Leaf):
-            raise InvalidRotationError
+            raise RuntimeError("Invalid right rotate")
 
         node_x.left = node_y.right
         if isinstance(node_y.right, Node):
