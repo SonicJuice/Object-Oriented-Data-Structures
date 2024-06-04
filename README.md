@@ -1,5 +1,5 @@
 # Python Data Structures
-Object-oriented implementations of various useful data structures!
+Thread safe implementations of various useful data structures!
 
 - Stack
 
@@ -15,4 +15,4 @@ Object-oriented implementations of various useful data structures!
 ## Graphs
 - Graph
 
-- Binary Search Tree
+- Red-Black Tree
