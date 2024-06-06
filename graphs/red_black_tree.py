@@ -47,7 +47,6 @@ class RBTree:
     def empty(self):
         return self.root is None or self.root == self._NIL
 
-    """ typing.Optional denotes that a variable can be of a specified type or None. """
     def search(self, key):
         with self._mutex:
             return self._search(key=key)
