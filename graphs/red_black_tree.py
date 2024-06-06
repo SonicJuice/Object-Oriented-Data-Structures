@@ -470,7 +470,7 @@ class RBTree:
 
     def _postorder_traverse(self, node: Union[Node, Leaf]) -> Iterator[tuple[Any, Any]]:
         if isinstance(node, Node):
-            """ left subtree, right subtree, current node.  """
+            """ left subtree, right subtree, current node. """
             yield from self._postorder_traverse(node.left)
             yield from self._postorder_traverse(node.right)
             yield (node.key, node.data)
