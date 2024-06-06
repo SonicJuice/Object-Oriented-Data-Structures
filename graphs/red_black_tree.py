@@ -1,6 +1,6 @@
 import enum
 from dataclasses import dataclass
-from typing import Any, Union, Optional, Iterator
+from typing import Any, Union
 from threading import Lock
 
 """ sublassing enum.Enum creates an enumeration (set of symbolic names bound to unique 
@@ -40,19 +40,19 @@ class RBTree:
         """ all the leaves are NIL and the root's parent can point to NIL, so make this,
         and all other nodes supported to point to NIL, point to a single NIL node. 
         The use of only one NIL node instance saves space. """
-        self._NIL: Leaf = Leaf()
-        self.root: Union[Node, Leaf] = self._NIL
+        self._NIL = Leaf()
+        self.root = self._NIL
         self._mutex = Lock()
 
-    def empty(self) -> bool:
+    def empty(self):
         return self.root is None or self.root == self._NIL
 
     """ typing.Optional denotes that a variable can be of a specified type or None. """
-    def search(self, key: Any) -> Optional[Node]:
+    def search(self, key):
         with self._mutex:
             return self._search(key=key)
 
-    def _search(self, key: Any) -> Optional[Node]:
+    def _search(self, key):
         """ look for a node with the given key. """
         current = self.root
 
@@ -69,7 +69,7 @@ class RBTree:
         """ if the Leaf is reached, the node doesn't exist. """
         raise NodeNotFoundError
 
-    def insert(self, key: Any, data: Any) -> None:
+    def insert(self, key, data):
         with self._mutex:
             new_node = Node(key=key, data=data, color=Color.RED)
             parent: Union[Node, Leaf] = self._NIL
@@ -97,10 +97,10 @@ class RBTree:
                     parent.right = new_node
                 self._insert_fixup(new_node)
 
-    def delete(self, key: Any) -> None:
+    def delete(self, key):
         """ find the node to be deleted and maintain its colour. """
         with self._mutex:
-            if (deleting_node := self._search(key=key)) and isinstance(deleting_node, Node):
+            if (deleting_node:= self._search(key=key)) and isinstance(deleting_node, Node):
                 original_color = deleting_node.color
 
                 """ if deleting_node has no children/only one left or right child. """
@@ -147,7 +147,7 @@ class RBTree:
     """ @staticmethods don't require access to the instance or class they belong to. This 
     means they can be called on a class or instance without any reference to them. """
     @staticmethod
-    def height(node: Union[Leaf, Node]) -> int:
+    def height(node):
         """ represents the longest length down to a leaf from the root. """
         if isinstance(node, Node):
             """ recursively increment the height by one for each child's height. If a node 
@@ -163,7 +163,7 @@ class RBTree:
         return 0
 
     @staticmethod
-    def leftmost(node: Node) -> Node:
+    def leftmost(node):
         """ left/rightmost node contains the minimum/maximum key in a given subtree. 
         Since these can be retrieved from any given subtree (if not the entire tree), 
         the parameter is the root of the given subtree. """
@@ -173,14 +173,14 @@ class RBTree:
         return current_node
 
     @staticmethod
-    def rightmost(node: Node) -> Node:
+    def rightmost(node):
         current_node = node
         while isinstance(current_node.right, Node):
             current_node = current_node.right
         return current_node
 
     @staticmethod
-    def successor(node: Node) -> Union[Node, Leaf]:
+    def successor(node):
         """ if the right child of the given node isn't empty, the leftmost node of the 
         left subtree is the predecessor. """
         if isinstance(node.right, Node):
@@ -195,7 +195,7 @@ class RBTree:
         return parent
 
     @staticmethod
-    def predecessor(node: Node) -> Union[Node, Leaf]:
+    def predecessor(node):
         if isinstance(node.left, Node):
             return RBTree.rightmost(node=node.left)
 
@@ -204,19 +204,17 @@ class RBTree:
             node = parent
             parent = parent.parent
         return node.parent
-
-    """ typing.iterator[tuple[Any, Any]] denotes that a variable implements __iter__() 
-    and __next__() to yield tuples containing two elements of any type. """
-    def inorder_traverse(self) -> Iterator[tuple[Any, Any]]:
+        
+    def inorder_traverse(self):
         return self._inorder_traverse(node=self.root)
 
-    def preorder_traverse(self) -> Iterator[tuple[Any, Any]]:
+    def preorder_traverse(self):
         return self._preorder_traverse(node=self.root)
 
-    def postorder_traverse(self) -> Iterator[tuple[Any, Any]]:
+    def postorder_traverse(self):
         return self._postorder_traverse(node=self.root)
 
-    def _left_rotate(self, node_x: Node) -> None:
+    def _left_rotate(self, node_x):
         node_y = node_x.right
         if isinstance(node_y, Leaf):
             raise RuntimeError("Invalid left rotate")
@@ -242,7 +240,7 @@ class RBTree:
         node_y.left = node_x
         node_x.parent = node_y
 
-    def _right_rotate(self, node_x: Node) -> None:
+    def _right_rotate(self, node_x):
         node_y = node_x.left
         if isinstance(node_y, Leaf):
             raise RuntimeError("Invalid right rotate")
@@ -262,7 +260,7 @@ class RBTree:
         node_y.right = node_x
         node_x.parent = node_y
 
-    def _insert_fixup(self, fixing_node: Node) -> None:
+    def _insert_fixup(self, fixing_node):
         """ RBTP 4 holds after insertion, as the new red node replaces a Leaf (NIL), 
         but its children are also Leaves. However, if its parent is also red, RBTP 3
         would be violated. RBTP 1 could also be violated if a new node is the root, or 
@@ -341,7 +339,7 @@ class RBTree:
     1 height) after _transplant() is used to replace a node. If the node to be deleted 
     has two children, the leftmost node's replacement becomes double-black or red-and-black 
     when _transplant() is used to remove the leftmost node of the subtree. """
-    def _delete_fixup(self, fixing_node: Union[Leaf, Node]) -> None:
+    def _delete_fixup(self, fixing_node):
         continue_fixing = True
         while fixing_node is not self.root and fixing_node.color == Color.BLACK and continue_fixing:
             if fixing_node == fixing_node.parent.left: 
@@ -440,7 +438,7 @@ class RBTree:
             if fixing_node.color is not Color.BLACK:
                 fixing_node.color = Color.BLACK
 
-    def _transplant(self, deleting_node: Node, replacing_node: Union[Node, Leaf]) -> None:
+    def _transplant(self, deleting_node, replacing_node):
         """ replace the subtree rooted at deleting_node with the one at replacing_node.
         After replacing_node replaces deleting_node, the latter's parent becomes the 
         former's, and deleting_node's parent has replacing_node as its child.  """
@@ -454,21 +452,21 @@ class RBTree:
         if isinstance(replacing_node, Node):
             replacing_node.parent = deleting_node.parent
 
-    def _inorder_traverse(self, node: Union[Node, Leaf]) -> Iterator[tuple[Any, Any]]:
+    def _inorder_traverse(self, node):
         if isinstance(node, Node):
             """ left subtree, current node, right subtree. """
             yield from self._inorder_traverse(node.left)
             yield (node.key, node.data)
             yield from self._inorder_traverse(node.right)
 
-    def _preorder_traverse(self, node: Union[Node, Leaf]) -> Iterator[tuple[Any, Any]]:
+    def _preorder_traverse(self, node: Union[Node, Leaf]):
         """ current node, left subtree, right subtree. """
         if isinstance(node, Node):
             yield (node.key, node.data)
             yield from self._preorder_traverse(node.left)
             yield from self._preorder_traverse(node.right)
 
-    def _postorder_traverse(self, node: Union[Node, Leaf]) -> Iterator[tuple[Any, Any]]:
+    def _postorder_traverse(self, node: Union[Node, Leaf]):
         if isinstance(node, Node):
             """ left subtree, right subtree, current node. """
             yield from self._postorder_traverse(node.left)
