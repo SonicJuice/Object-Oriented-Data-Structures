@@ -72,8 +72,8 @@ class RBTree:
     def insert(self, key, data):
         with self._mutex:
             new_node = Node(key=key, data=data, color=Color.RED)
-            parent: Union[Node, Leaf] = self._NIL
-            current: Union[Node, Leaf] = self.root
+            parent = self._NIL
+            current = self.root
 
             """ iterate from the root to find the correct position for the new, red node. """
             while isinstance(current, Node):
@@ -204,7 +204,7 @@ class RBTree:
             node = parent
             parent = parent.parent
         return node.parent
-        
+
     def inorder_traverse(self):
         return self._inorder_traverse(node=self.root)
 
@@ -267,7 +267,7 @@ class RBTree:
         the root becomes red, whilst fixing RBTP 3. Fixing RBTP 3 can be thought of in 
         six cases. """
         while fixing_node.parent.color == Color.RED:
-            if fixing_node.parent == fixing_node.parent.parent.left: 
+            if fixing_node.parent == fixing_node.parent.parent.left:
                 parent_sibling = fixing_node.parent.parent.right 
 
                 """ Case 1). if the new node's parent's location is the left child, the 
@@ -285,7 +285,7 @@ class RBTree:
                     """ Case 2). if the new node's parent's location is the left child, 
                     the parent's sibling is black, and the new node's location is the 
                     right child. """
-                    if fixing_node == fixing_node.parent.right: 
+                    if fixing_node == fixing_node.parent.right:
                         fixing_node = fixing_node.parent 
                         """ left rotate fixing_node's parent. """
                         self._left_rotate(fixing_node)
@@ -459,14 +459,14 @@ class RBTree:
             yield (node.key, node.data)
             yield from self._inorder_traverse(node.right)
 
-    def _preorder_traverse(self, node: Union[Node, Leaf]):
+    def _preorder_traverse(self, node):
         """ current node, left subtree, right subtree. """
         if isinstance(node, Node):
             yield (node.key, node.data)
             yield from self._preorder_traverse(node.left)
             yield from self._preorder_traverse(node.right)
 
-    def _postorder_traverse(self, node: Union[Node, Leaf]):
+    def _postorder_traverse(self, node):
         if isinstance(node, Node):
             """ left subtree, right subtree, current node. """
             yield from self._postorder_traverse(node.left)
