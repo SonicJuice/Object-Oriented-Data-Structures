@@ -28,7 +28,7 @@ def murmurhash3(key, seed=0x0):
         """ bitwise AND with 0xFFFFFFFF avoids overflow by ensuring that intermediate 
         results are constrained to 32 bits. """
         k1 = (c1 * k1) & 0xFFFFFFFF
-        """ 13, 15, 17, 19 are chosen to be non-powers-of-two to avoid alignment issues
+        """ 13, 15, 17, 19 are non-powers-of-two chosen to avoid alignment issues
         and ensure that all bits influence each other. """
         k1 = (k1 << 15 | k1 >> 17) & 0xFFFFFFFF
         k1 = (c2 * k1) & 0xFFFFFFFF
