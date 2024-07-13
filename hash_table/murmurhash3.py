@@ -12,9 +12,8 @@ def murmurhash3(key, seed=0x0):
     h1 = seed
     """ c1, c2, and 0xe6546b64 are derived from primes, helping to uniformly spread the 
     input bits. They also provide a mixture of high and low bit patterns, maximising 
-    entropy (unpredictability) during mixing (thoroughly combining and transforming the 
-    input data to produce a hash). Furthermore, the mixing strength of the specific 
-    values avoid patterns that would reduce the effectiveness of bitwise operations. """
+    entropy during mixing. Furthermore, the mixing strength of the specific values avoid 
+    patterns that would reduce the effectiveness of bitwise operations. """
     c1 = 0xcc9e2d51
     c2 = 0x1b873593
 
