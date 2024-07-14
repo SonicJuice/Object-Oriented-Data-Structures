@@ -12,9 +12,9 @@ def murmurhash3(key, seed=0x0):
     distribution across buckets. """
     h1 = seed
     """ c1, c2, and 0xe6546b64 are derived from primes, helping to uniformly spread 
-    input bits. They also represent high and low bit patterns, maximising entropy 
-    during mixing. Their mixing strengths also avoid patterns that would reduce the 
-    effectiveness of bitwise operations. """
+    input bits. Their high and low bit patterns maximise entropy during mixing. Their 
+    mixing strengths also avoid patterns that would reduce the effectiveness of bitwise 
+    operations. """
     c1 = 0xcc9e2d51
     c2 = 0x1b873593
 
@@ -25,11 +25,11 @@ def murmurhash3(key, seed=0x0):
              key_bytes[block_start + 1] <<  8 | \
              key_bytes[block_start + 0]
 
-        """ bitwise AND with 0xFFFFFFFF avoids overflow by ensuring that intermediate 
-        results are constrained to 32 bits. """
+        """ bitwise AND with 0xFFFFFFFF avoids overflow by constraining intermediate 
+        results to 32 bits. """
         k1 = (c1 * k1) & 0xFFFFFFFF
         """ 13, 15, 17, 19 are non-powers-of-two chosen to avoid alignment issues
-        and ensure that all bits influence each other. """
+        and to ensure that all bits influence each other. """
         k1 = (k1 << 15 | k1 >> 17) & 0xFFFFFFFF
         k1 = (c2 * k1) & 0xFFFFFFFF
 
@@ -37,9 +37,10 @@ def murmurhash3(key, seed=0x0):
         h1 = (h1 << 13 | h1 >> 19) & 0xFFFFFFFF
         h1 = (h1 * 5 + 0xe6546b64) & 0xFFFFFFFF
 
-    """ combine remaining 1 to 3 bytes not covered by the 4-byte blocks. """
+    """ start of the remaining bytes. """
     tail_index = nblocks * 4
     k1 = 0
+    """ number of remaining bytes after processing all four byte blocks. """
     tail_size = key_length & 3
 
     if tail_size >= 3:
