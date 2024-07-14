@@ -6,7 +6,7 @@ from threading import Lock
 """ sublassing enum.Enum creates an enumeration (set of symbolic names bound to unique 
 constants. Within an enumeration, values can be compared by identity, and the enumeration 
 itself can be iterated over). """
-class Color(enum.Enum):
+class Colour(enum.Enum):
     """ enum.auto() assigns automatic values (consecutive integers by default) to enum 
     members. """
     RED = enum.auto()
@@ -17,7 +17,7 @@ __eq__()) based on class attributes (__hash__() if all attributes are immutable)
 allows for immutable instantiations. """
 @dataclass(frozen=True)
 class Leaf:
-    color = Color.BLACK
+    colour = Colour.BLACK
 
 @dataclass
 class Node:
@@ -28,7 +28,7 @@ class Node:
     left: Union["Node", Leaf] = Leaf()
     right: Union["Node", Leaf] = Leaf()
     parent: Union["Node", Leaf] = Leaf()
-    color: Color = Color.RED
+    colour: Colour = Colour.RED
 
 """ Red-Black-Tree-Property (RBTP):
 1). The root is black.
@@ -70,7 +70,7 @@ class RBTree:
 
     def insert(self, key, data):
         with self._mutex:
-            new_node = Node(key=key, data=data, color=Color.RED)
+            new_node = Node(key=key, data=data, colour=Colour.RED)
             parent = self._NIL
             current = self.root
 
@@ -86,7 +86,7 @@ class RBTree:
             new_node.parent = parent
             """ if the parent is a leaf, make the new node into the black root. """
             if isinstance(parent, Leaf):
-                new_node.color = Color.BLACK
+                new_node.colour = Colour.BLACK
                 self.root = new_node
             else:
                 """ otherwise, attach the new node as the appropriate child of the parent. """
@@ -100,27 +100,27 @@ class RBTree:
         """ find the node to be deleted and maintain its colour. """
         with self._mutex:
             if (deleting_node:= self._search(key=key)) and isinstance(deleting_node, Node):
-                original_color = deleting_node.color
+                original_colour = deleting_node.colour
 
                 """ if deleting_node has no children/only one left or right child. """
                 if isinstance(deleting_node.left, Leaf):
                     replacing_node = deleting_node.right
                     """ replace deleting_node with NIL or the only child. """
                     self._transplant(deleting_node=deleting_node, replacing_node=replacing_node)
-                    if original_color == Color.BLACK and isinstance(replacing_node, Node):
+                    if original_colour == Colour.BLACK and isinstance(replacing_node, Node):
                         self._delete_fixup(fixing_node=replacing_node)
 
                 elif isinstance(deleting_node.right, Leaf):
                     replacing_node = deleting_node.left
                     self._transplant(deleting_node=deleting_node, replacing_node=replacing_node)
-                    if original_color == Color.BLACK and isinstance(replacing_node, Node):
+                    if original_colour == Colour.BLACK and isinstance(replacing_node, Node):
                         self._delete_fixup(fixing_node=replacing_node)
 
                 else:
                     """ if deleting_node has two children, find its successor replacing_node 
-                    and keep its color. """
+                    and keep its colour. """
                     replacing_node = self.leftmost(deleting_node.right)
-                    original_color = replacing_node.color
+                    original_colour = replacing_node.colour
                     replacing_replacement = replacing_node.right
 
                     if replacing_node.parent == deleting_node:
@@ -138,9 +138,9 @@ class RBTree:
                     self._transplant(deleting_node, replacing_node)
                     replacing_node.left = deleting_node.left
                     replacing_node.left.parent = replacing_node
-                    replacing_node.color = deleting_node.color
+                    replacing_node.colour = deleting_node.colour
 
-                    if original_color == Color.BLACK and isinstance(replacing_replacement, Node):
+                    if original_colour == Colour.BLACK and isinstance(replacing_replacement, Node):
                         self._delete_fixup(fixing_node=replacing_replacement)
 
     """ @staticmethods don't require access to the instance or class they belong to. This 
@@ -265,18 +265,18 @@ class RBTree:
         would be violated. RBTP 1 could also be violated if a new node is the root, or 
         the root becomes red, whilst fixing RBTP 3. Fixing RBTP 3 can be thought of in 
         six cases. """
-        while fixing_node.parent.color == Color.RED:
+        while fixing_node.parent.colour == Colour.RED:
             if fixing_node.parent == fixing_node.parent.parent.left:
                 parent_sibling = fixing_node.parent.parent.right 
 
                 """ Case 1). if the new node's parent's location is the left child, the 
                 parent's sibling is red, and the new node's location doesn't matter. """
-                if parent_sibling.color == Color.RED:
+                if parent_sibling.colour == Colour.RED:
                     """ make fixing_node's parent and the parent's sibling black. """
-                    fixing_node.parent.color = Color.BLACK
-                    parent_sibling.color = Color.BLACK
+                    fixing_node.parent.colour = Colour.BLACK
+                    parent_sibling.colour = Colour.BLACK
                     """ make the fixing node's grandparent red. """
-                    fixing_node.parent.parent.color = Color.RED 
+                    fixing_node.parent.parent.colour = Colour.RED 
                     """ move to the current location of the grandparent. """
                     fixing_node = fixing_node.parent.parent
 
@@ -292,9 +292,9 @@ class RBTree:
                     """ Case 3). if the new node's parent's location is the left child, 
                     the parent's sibling is black, and the new node's location is the left 
                     child. """
-                    fixing_node.parent.color = Color.BLACK
+                    fixing_node.parent.colour = Colour.BLACK
                     """ make fixing_node's parent/grandparent black/red. """
-                    fixing_node.parent.parent.color = Color.RED 
+                    fixing_node.parent.parent.colour = Colour.RED 
                     """ right rotate the latter. """
                     self._right_rotate(fixing_node.parent.parent) 
 
@@ -303,10 +303,10 @@ class RBTree:
                 the parent's sibling is red, and the new node's doesn't matter. """
                 parent_sibling = fixing_node.parent.parent.left 
                 """ repeat Case 1. """
-                if parent_sibling.color == Color.RED:
-                    fixing_node.parent.color = Color.BLACK
-                    parent_sibling.color = Color.BLACK
-                    fixing_node.parent.parent.color = Color.RED 
+                if parent_sibling.colour == Colour.RED:
+                    fixing_node.parent.colour = Colour.BLACK
+                    parent_sibling.colour = Colour.BLACK
+                    fixing_node.parent.parent.colour = Colour.RED 
                     fixing_node = fixing_node.parent.parent
 
                 else:
@@ -321,9 +321,9 @@ class RBTree:
                     """ Case 6). if the new node's parent's location is the right child, 
                     the parent's sibling is black, and the new node's location is the right 
                     child. """
-                    fixing_node.parent.color = Color.BLACK
+                    fixing_node.parent.colour = Colour.BLACK
                     """ make fixing_node's parent/grandparent black/red. """
-                    fixing_node.parent.parent.color = Color.RED 
+                    fixing_node.parent.parent.colour = Colour.RED 
                     self._left_rotate(fixing_node.parent.parent) 
 
         """ while fixing the broken RBTP for fixing_node, its parent or grandparent 
@@ -331,7 +331,7 @@ class RBTree:
         the new fixing_node. Then, it can be solved according to the six cases. Repeat 
         this step until the root is reached; if it becomes red (violating RBTP 1) 
         after the fix operations, make it black. """
-        self.root.color = Color.BLACK
+        self.root.colour = Colour.BLACK
 
     """ To fix RBTP 4, pretend fixing_node has one extra black or red. Thus, if the node 
     to be deleted has < two children, it becomes 'double-black' or 'red-and-black' (2 or 
@@ -340,26 +340,26 @@ class RBTree:
     when _transplant() is used to remove the leftmost node of the subtree. """
     def _delete_fixup(self, fixing_node):
         continue_fixing = True
-        while fixing_node is not self.root and fixing_node.color == Color.BLACK and continue_fixing:
+        while fixing_node is not self.root and fixing_node.colour == Colour.BLACK and continue_fixing:
             if fixing_node == fixing_node.parent.left: 
                 sibling = fixing_node.parent.right 
 
                 """ Case 1). if fixing_node is a left child, its sibling is red, 
                 and both of its sibling's childrens' colours don't matter. """
-                if sibling.color == Color.RED:
+                if sibling.colour == Colour.RED:
                     """ make the sibling node and fixing_node's parent black and red, 
                     left rotate fixing_node's parent, and update the sibling node. """
-                    fixing_node.parent.color = Color.RED 
+                    fixing_node.parent.colour = Colour.RED 
                     self._left_rotate(fixing_node.parent) 
                     sibling = fixing_node.parent.right 
 
                 if isinstance(sibling, Leaf):
                     continue_fixing = False
 
-                elif sibling.left.color == Color.BLACK and sibling.right.color == Color.BLACK:
+                elif sibling.left.colour == Colour.BLACK and sibling.right.colour == Colour.BLACK:
                     """ Case 2). if fixing_node is a left child, and its sibling and both 
                     of its children are black. """
-                    sibling.color = Color.RED
+                    sibling.colour = Colour.RED
                     """ make the sibling red and move fixing_node up (the new fixing_node 
                     becomes the original's parent). """
                     fixing_node = fixing_node.parent 
@@ -367,25 +367,25 @@ class RBTree:
                 else:
                     """ Case 3). if fixing_node is a left child, its sibling is black, 
                     and the sibling's left/right child is red/black. """
-                    if sibling.right.color == Color.BLACK:
+                    if sibling.right.colour == Colour.BLACK:
                         """ make the sibling/its left child red/black, and right rotate 
                         the sibling node. """
-                        if sibling.left.color is not Color.BLACK:
-                            sibling.left.color = Color.BLACK 
-                        sibling.color = Color.RED 
+                        if sibling.left.colour is not Colour.BLACK:
+                            sibling.left.colour = Colour.BLACK 
+                        sibling.colour = Colour.RED 
                         self._right_rotate(node_x=sibling) 
 
                     """ Case 4). if fixing_node is a left child, its sibling is black, 
                     and its left/right child is black/red. """
-                    sibling.color = fixing_node.parent.color 
+                    sibling.colour = fixing_node.parent.colour 
                     """ make the sibling the same colour as fixing_node's parent,
                     the fixing_node‘s parent black, and sibling node's right child 
                     black. Left rotate fixing_node's parent; after these operations, 
                     all violated red-black-tree-property are restored. """
-                    if fixing_node.parent.color is not Color.BLACK: 
-                        fixing_node.parent.color = Color.BLACK 
-                    if sibling.right.color is not Color.BLACK:
-                        sibling.right.color = Color.BLACK 
+                    if fixing_node.parent.colour is not Colour.BLACK: 
+                        fixing_node.parent.colour = Colour.BLACK 
+                    if sibling.right.colour is not Colour.BLACK:
+                        sibling.right.colour = Colour.BLACK 
                     self._left_rotate(node_x=fixing_node.parent) 
                     fixing_node = self.root
 
@@ -395,47 +395,47 @@ class RBTree:
                 sibling = fixing_node.parent.left
                 """ make the sibling node and fixing_node's parent black and red, 
                 right rotate fixing_node's parent, and update the sibling node. """
-                if sibling.color == Color.RED:
-                    fixing_node.parent.color = Color.RED 
+                if sibling.colour == Colour.RED:
+                    fixing_node.parent.colour = Colour.RED 
                     self._right_rotate(node_x=fixing_node.parent) 
                     sibling = fixing_node.parent.left 
 
                 if isinstance(sibling, Leaf):
                     continue_fixing = False
 
-                elif sibling.right.color == Color.BLACK and sibling.left.color == Color.BLACK:
+                elif sibling.right.colour == Colour.BLACK and sibling.left.colour == Colour.BLACK:
                     """ Case 6). if fixing_node is a right child, and its sibling and both 
                     of its children are black. """
-                    sibling.color = Color.RED
+                    sibling.colour = Colour.RED
                     """ make the sibling red and move fixing_node up. """
                     fixing_node = fixing_node.parent
 
                 else:
                     """ Case 7). if fixing_node is a right child, its sibling is black, 
                     and its left/right child is black/red. """
-                    if sibling.left.color == Color.BLACK:
+                    if sibling.left.colour == Colour.BLACK:
                         """ make the sibling and its right child red/black, and left 
                         rotate the left sibling. """
-                        if sibling.right.color is not Color.BLACK:
-                            sibling.right.color = Color.BLACK
-                        sibling.color = Color.RED
+                        if sibling.right.colour is not Colour.BLACK:
+                            sibling.right.colour = Colour.BLACK
+                        sibling.colour = Colour.RED
                         self._left_rotate(node_x=sibling)  
 
                     """ Case 8). if fixing_node is a right child, its sibling is black, 
                     and its left/right child is red/black. """
-                    sibling.color = fixing_node.parent.color
+                    sibling.colour = fixing_node.parent.colour
                     """ make the sibling the same colour as fixing_node's parent,
                     the fixing_node‘s parent black, and sibling node's left child 
                     black. Right rotate fixing_node's parent. """
-                    if fixing_node.parent.color is not Color.BLACK:
-                        fixing_node.parent.color = Color.BLACK
-                    if sibling.left.color is not Color.BLACK:
-                        sibling.left.color = Color.BLACK
+                    if fixing_node.parent.colour is not Colour.BLACK:
+                        fixing_node.parent.colour = Colour.BLACK
+                    if sibling.left.colour is not Colour.BLACK:
+                        sibling.left.colour = Colour.BLACK
                     self._right_rotate(node_x=fixing_node.parent)
                     fixing_node = self.root
 
-            if fixing_node.color is not Color.BLACK:
-                fixing_node.color = Color.BLACK
+            if fixing_node.colour is not Colour.BLACK:
+                fixing_node.colour = Colour.BLACK
 
     def _transplant(self, deleting_node, replacing_node):
         """ replace the subtree rooted at deleting_node with the one at replacing_node.
