@@ -35,7 +35,7 @@ class Node:
 2). Every leaf is black.
 3). If a node is red, both of its children are black.
 4). Every path from a node to any of its leaves contains the same number of blacks. """
-class RBTree: # maintains O(log n) height for an upper bound of O(log n) for insertions, searches and deletions.
+class RBTree:
     def __init__(self):
         """ all the leaves are NIL and the root's parent can point to NIL, so make this,
         and all other nodes supported to point to NIL, point to a single NIL node. 
