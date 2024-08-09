@@ -1,5 +1,5 @@
-# Python Data Structures
-Thread safe implementations of various useful data structures, these being:
+# Python Thread-Safe Data Structures
+Thread-safe implementations of various useful data structures, these being:
 
 - Graph
 - Red-Black Tree
