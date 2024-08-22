@@ -66,79 +66,77 @@ class RBTree:
         raise NodeNotFoundError
 
     def insert(self, key, data):
-        with self._mutex:
-            new_node = Node(key=key, data=data, colour=Colour.RED)
-            parent = self._NIL
-            current = self.root
+        new_node = Node(key=key, data=data, colour=Colour.RED)
+        parent = self._NIL
+        current = self.root
 
-            """ iterate from the root to find the correct position for the new, red node. """
-            while isinstance(current, Node):
-                parent = current
-                if new_node.key < current.key:
-                    current = current.left
-                elif new_node.key > current.key:
-                    current = current.right
-                else:
-                    raise DuplicateKeyError
-            new_node.parent = parent
-            """ if the parent is a leaf, make the new node into the black root. """
-            if isinstance(parent, Leaf):
-                new_node.colour = Colour.BLACK
-                self.root = new_node
+        """ iterate from the root to find the correct position for the new, red node. """
+        while isinstance(current, Node):
+            parent = current
+            if new_node.key < current.key:
+                current = current.left
+            elif new_node.key > current.key:
+                current = current.right
             else:
-                """ otherwise, attach the new node as the appropriate child of the parent. """
-                if new_node.key < parent.key:
-                    parent.left = new_node
-                else:
-                    parent.right = new_node
-                self._insert_fixup(new_node)
+                raise DuplicateKeyError
+        new_node.parent = parent
+        """ if the parent is a leaf, make the new node into the black root. """
+        if isinstance(parent, Leaf):
+            new_node.colour = Colour.BLACK
+            self.root = new_node
+        else:
+            """ otherwise, attach the new node as the appropriate child of the parent. """
+            if new_node.key < parent.key:
+                parent.left = new_node
+            else:
+                parent.right = new_node
+            self._insert_fixup(new_node)
 
     def delete(self, key):
         """ find the node to be deleted and maintain its colour. """
-        with self._mutex:
-            if (deleting_node:= self._search(key=key)) and isinstance(deleting_node, Node):
-                original_colour = deleting_node.colour
+        if (deleting_node:= self._search(key=key)) and isinstance(deleting_node, Node):
+            original_colour = deleting_node.colour
 
-                """ if deleting_node has no children/only one left or right child. """
-                if isinstance(deleting_node.left, Leaf):
-                    replacing_node = deleting_node.right
-                    """ replace deleting_node with NIL or the only child. """
-                    self._transplant(deleting_node=deleting_node, replacing_node=replacing_node)
-                    if original_colour == Colour.BLACK and isinstance(replacing_node, Node):
-                        self._delete_fixup(fixing_node=replacing_node)
+            """ if deleting_node has no children/only one left or right child. """
+            if isinstance(deleting_node.left, Leaf):
+                replacing_node = deleting_node.right
+                """ replace deleting_node with NIL or the only child. """
+                self._transplant(deleting_node=deleting_node, replacing_node=replacing_node)
+                if original_colour == Colour.BLACK and isinstance(replacing_node, Node):
+                    self._delete_fixup(fixing_node=replacing_node)
 
-                elif isinstance(deleting_node.right, Leaf):
-                    replacing_node = deleting_node.left
-                    self._transplant(deleting_node=deleting_node, replacing_node=replacing_node)
-                    if original_colour == Colour.BLACK and isinstance(replacing_node, Node):
-                        self._delete_fixup(fixing_node=replacing_node)
+            elif isinstance(deleting_node.right, Leaf):
+                replacing_node = deleting_node.left
+                self._transplant(deleting_node=deleting_node, replacing_node=replacing_node)
+                if original_colour == Colour.BLACK and isinstance(replacing_node, Node):
+                    self._delete_fixup(fixing_node=replacing_node)
 
+            else:
+                """ if deleting_node has two children, find its successor replacing_node 
+                and keep its colour. """
+                replacing_node = self.leftmost(deleting_node.right)
+                original_colour = replacing_node.colour
+                replacing_replacement = replacing_node.right
+
+                if replacing_node.parent == deleting_node:
+                    if isinstance(replacing_replacement, Node):
+                        replacing_replacement.parent = replacing_node
                 else:
-                    """ if deleting_node has two children, find its successor replacing_node 
-                    and keep its colour. """
-                    replacing_node = self.leftmost(deleting_node.right)
-                    original_colour = replacing_node.colour
-                    replacing_replacement = replacing_node.right
+                    """ remove replacing_node and keep tracing the node to replace 
+                    replacing_node (either NIL or its original right child). """
+                    self._transplant(replacing_node, replacing_node.right)
+                    replacing_node.right = deleting_node.right
+                    replacing_node.right.parent = replacing_node
 
-                    if replacing_node.parent == deleting_node:
-                        if isinstance(replacing_replacement, Node):
-                            replacing_replacement.parent = replacing_node
-                    else:
-                        """ remove replacing_node and keep tracing the node to replace 
-                        replacing_node (either NIL or its original right child). """
-                        self._transplant(replacing_node, replacing_node.right)
-                        replacing_node.right = deleting_node.right
-                        replacing_node.right.parent = replacing_node
+                """ replace deleting_node with replacing_node, giving it the former's 
+                colour. """
+                self._transplant(deleting_node, replacing_node)
+                replacing_node.left = deleting_node.left
+                replacing_node.left.parent = replacing_node
+                replacing_node.colour = deleting_node.colour
 
-                    """ replace deleting_node with replacing_node, giving it the former's 
-                    colour. """
-                    self._transplant(deleting_node, replacing_node)
-                    replacing_node.left = deleting_node.left
-                    replacing_node.left.parent = replacing_node
-                    replacing_node.colour = deleting_node.colour
-
-                    if original_colour == Colour.BLACK and isinstance(replacing_replacement, Node):
-                        self._delete_fixup(fixing_node=replacing_replacement)
+                if original_colour == Colour.BLACK and isinstance(replacing_replacement, Node):
+                    self._delete_fixup(fixing_node=replacing_replacement)
 
     """ @staticmethods don't require access to the instance or class they belong to. This 
     means they can be called on a class or instance without any reference to them. """
