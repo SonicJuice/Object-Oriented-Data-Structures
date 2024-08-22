@@ -1,7 +1,6 @@
 import enum
 from dataclasses import dataclass
 from typing import Any, Union
-from threading import Lock
 
 """ sublassing enum.Enum creates an enumeration (set of symbolic names bound to unique 
 constants. Within an enumeration, values can be compared by identity, and the enumeration 
@@ -42,14 +41,12 @@ class RBTree:
         The use of only one NIL node instance saves space. """
         self._NIL = Leaf()
         self.root = self._NIL
-        self._mutex = Lock()
 
     def empty(self):
         return self.root is None or self.root == self._NIL
 
     def search(self, key):
-        with self._mutex:
-            return self._search(key=key)
+        return self._search(key=key)
 
     def _search(self, key):
         """ look for a node with the given key. """
