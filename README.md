@@ -9,4 +9,5 @@ Object-oriented implementations of various useful data structures!
 - Priority Queue
 - Stack
 ## Hash Table ##
-- Hash Table (w/ MurmurHash3)
+- Hash Table
+- MurmurHash3
