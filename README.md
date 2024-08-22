@@ -1,10 +1,10 @@
 # Object-Oriented Data Structures
 Object-oriented implementations of various useful data structures!
 
-## Graph ##
+## Graphs ##
 - Graph
 - Red-Black Tree
-## Queue (All Thread Safe!) ##
+## Queues (All Thread Safe!) ##
 - Queue
 - Priority Queue
 - Stack
