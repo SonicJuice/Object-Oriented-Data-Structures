@@ -1,11 +1,11 @@
-# Python Thread-Safe Data Structures
-Thread-safe implementations of various useful data structures!
+# Object-Oriented Data Structures
+Object-Oriented implementations of various useful data structures!
 
 ## Graph ##
 - Graph
 - Red-Black Tree
 - Hash Table
-## Queue ##
+## Queue (Thread Safe!) ##
 - Queue
 - Priority Queue
 - Stack
