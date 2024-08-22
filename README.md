@@ -1,5 +1,5 @@
 # Object-Oriented Data Structures
-Object-Oriented implementations of various useful data structures!
+Object-oriented implementations of various useful data structures!
 
 ## Graph ##
 - Graph
