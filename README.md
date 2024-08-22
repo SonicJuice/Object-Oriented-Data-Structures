@@ -5,7 +5,9 @@ Object-oriented implementations of various useful data structures!
 - Graph
 - Red-Black Tree
 - Hash Table
-## Queue (Thread Safe!) ##
+## Queue (All Thread Safe!) ##
 - Queue
 - Priority Queue
 - Stack
+## Hash Table ##
+- Hash Table (w/ MurmurHash3)
